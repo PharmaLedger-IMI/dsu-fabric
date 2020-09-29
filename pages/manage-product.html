@@ -1,0 +1,21 @@
+<psk-page title="Manage Product">
+    <psk-form controller-name="newProductController">
+        <psk-text-input label="Name" value="@product.name"></psk-text-input>
+        <psk-text-input label="GTIN" value="@product.gtin"></psk-text-input>
+        <psk-textarea label="Description" value="@product.description"></psk-textarea>
+
+        <psk-form-row>
+            <psk-img-input src="@product.photo" event-name="product-photo-selected" label="Photo"></psk-img-input>
+        </psk-form-row>
+
+        <psk-form-row>
+            <psk-label label="Leaflet"></psk-label>
+            <psk-files-chooser label="Attach Leaflet" event-name="leaflet-selected" class="paperclip"></psk-files-chooser>
+            <psk-label label="@attachment.name" class="inline"></psk-label>
+        </psk-form-row>
+
+        <psk-button label="Save Product" event-name="add-product"></psk-button>
+
+        <psk-list-feedbacks></psk-list-feedbacks>
+    </psk-form>
+</psk-page>

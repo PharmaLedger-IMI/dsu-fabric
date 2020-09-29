@@ -1,0 +1,21 @@
+<psk-page title="Batches">
+    <psk-form controller-name="batchesController">
+        <psk-for-each data-view-model="@batches">
+            <psk-form-row columns="4" layout="xs=[2,1,2,7] s=[2,1,2,7] m=[2,1,2,7] l=[2,1,2,7] xl=[2,1,2,7]"
+                          class="withSeparator">
+                <psk-label label="Batch number:"></psk-label>
+                <b>
+                    <psk-label label="@batchNumber"></psk-label>
+                </b>
+                <psk-label label="Expiration date:"></psk-label>
+                    <psk-date-input value="@expiration" read-only></psk-date-input>
+            </psk-form-row>
+            <div slot="no-data">No Batches.</div>
+        </psk-for-each>
+        <psk-form-row>
+            <div style="min-height: 30px;"></div>
+            <psk-button label="Add batch" event-name="add-batch"></psk-button>
+        </psk-form-row>
+    </psk-form>
+
+</psk-page>

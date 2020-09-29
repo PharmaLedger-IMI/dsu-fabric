@@ -1,0 +1,20 @@
+<psk-page title="Products">
+    <psk-form controller-name="ProductsController">
+        <psk-condition condition="@productsListLoaded">
+            <psk-for-each slot="condition-true" data-view-model="products">
+                <psk-form-row columns="4" layout="xs=[2,1,2,7] s=[2,1,2,7] m=[2,1,2,7] l=[2,1,2,7] xl=[2,1,2,7]" class="withSeparator">
+                    <psk-label label="Product name"></psk-label>
+                    <b><psk-label label="@name"></psk-label></b>
+                    <psk-label label="KeySSI"></psk-label>
+                    <psk-text-input value="@keySSI" read-only></psk-text-input>
+                </psk-form-row>
+                <div slot="no-data">No Products.</div>
+            </psk-for-each>
+            <div slot="condition-false">
+                Product list loading...
+            </div>
+        </psk-condition>
+        <div style="min-height: 30px;"></div>
+        <psk-button event-name="add-product" label="Add Product"></psk-button>
+    </psk-form>
+</psk-page>

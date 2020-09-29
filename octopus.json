@@ -1,0 +1,60 @@
+{
+  "workDir": ".",
+  "dependencies": [
+    {
+      "name": "privatesky",
+      "actions": [
+        {
+          "type": "copy",
+          "src": "../../privatesky/psknode/bundles/webshims.js",
+          "target": "./scripts/bundles/webshims.js",
+          "options": {
+            "overwrite": true
+          }
+        },
+        {
+          "type": "copy",
+          "src": "../../privatesky/psknode/bundles/pskruntime.js",
+          "target": "./scripts/bundles/pskruntime.js",
+          "options": {
+            "overwrite": true
+          }
+        },
+        {
+          "type": "copy",
+          "src": "../../privatesky/psknode/bundles/edfsBar.js",
+          "target": "./scripts/bundles/edfsBar.js",
+          "options": {
+            "overwrite": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "cardinal",
+      "actions": [
+        {
+          "type": "execute",
+          "cmd": "cd ../../cardinal && npm run dist ../web-server/dsu-fabric"
+        },
+        {
+          "type": "remove",
+          "target": "./latest-change-set.txt"
+        }
+      ]
+    },
+    {
+      "name": "citrus-theme",
+      "actions": [
+        {
+          "type": "copy",
+          "src": "../../themes/citrus-theme/src",
+          "target": "themes/citrus-theme",
+          "options": {
+            "overwrite": true
+          }
+        }
+      ]
+    }
+  ]
+}
