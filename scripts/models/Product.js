@@ -22,7 +22,7 @@ export default class Product {
 		}
 
 		if (!this.gtin) {
-			errors.push('Product Type Serial Number is required.');
+			errors.push('GTIN is required.');
 		}
 
 		return errors.length === 0 ? true : errors;
