@@ -13,6 +13,10 @@ export default class Product {
 				this[prop] = product[prop];
 			}
 		}
+
+		if (this.gtin === "") {
+			this.gtin = Utils.generateNumericID(14);
+		}
 	}
 
 	validate(){
