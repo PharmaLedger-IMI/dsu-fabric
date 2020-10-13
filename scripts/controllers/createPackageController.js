@@ -1,6 +1,6 @@
 import ContainerController from '../../cardinal/controllers/base-controllers/ContainerController.js';
 import Package from '../models/Package.js';
-import GTIN_DSU_Builder from "../services/GTIN_DSU_Builder.js";
+import GTIN_DSU_Builder from "../services/DSU_Builder.js";
 import Batch from "../models/Batch.js";
 import Countries from "../models/Countries.js";
 import storage from "../services/Storage.js";

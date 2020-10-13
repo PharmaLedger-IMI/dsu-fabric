@@ -14,23 +14,27 @@ export default class DSU_Builder {
         doPost(url, dlDomain, callback);
     }
 
-    setSeedKey(transactionId, seedKey, callback) {
-        const url = `/setSeedKey/${transactionId}`;
-        doPost(url, seedKey, callback);
+    setKeySSI(transactionId, keyssi, callback) {
+        const url = `/setKeySSI/${transactionId}`;
+        doPost(url, keyssi, callback);
+    }
 
+    setGtinSSI(transactionId, dlDomain, gtin, batch, expiration, callback){
+        const body = {dlDomain, gtin, batch, expiration}
+        const url = `/gtin/${transactionId}`;
+        doPost(url, JSON.stringify(body), callback);
     }
 
     addFileDataToDossier(transactionId, fileName, fileData, callback) {
         const url = `/addFile/${transactionId}`;
-        let body;
 
-        if(fileData instanceof File){
-            body = new FormData();
+        /*if(fileData instanceof File){*/
+            let body = new FormData();
             let inputType = "file";
             body.append(inputType, fileData);
-        }else{
-            body = fileData;
-        }
+        /*}else{
+           body = fileData;
+        }*/
 
         doPost(url, body, {headers: {"x-dossier-path": fileName}}, callback);
     }

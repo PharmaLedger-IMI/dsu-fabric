@@ -34,7 +34,7 @@ export default class newProductController extends ContainerController {
         });
 
         this.on("leaflet-selected", (event) => {
-            this.leafletFile = event.data;
+            this.leafletFile = event.data[0];
         });
 
         this.on('openFeedback', (e) => {

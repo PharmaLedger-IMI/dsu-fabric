@@ -7,5 +7,5 @@ export default {
     'BATCH_STORAGE_FILE': "/batch.json",
     'PRODUCT_STORAGE_FILE': "/product.json",
     'PRODUCT_IMAGE_FILE': "/image.png",
-    'LEAFLET_ATTACHMENT_FILE': "/leaflet.pdf"
+    'LEAFLET_ATTACHMENT_FILE': "/leaflet.xml"
 }
