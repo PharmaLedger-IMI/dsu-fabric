@@ -67,6 +67,7 @@ export default class createPackageController extends ContainerController {
             const mo = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(expirationDate);
             const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(expirationDate);
             pack.expiration = `${ye}${mo}${da}`;
+            pack.serialNumber = this.model.package.serialNumber;
 
             this.buildPackageDSU(pack, (err, gtinSSI)=>{
                 if (err) {
@@ -75,7 +76,6 @@ export default class createPackageController extends ContainerController {
                 }
                 console.log("Package was created.", gtinSSI);
                 pack.keySSI = gtinSSI;
-                pack.serialNumber = this.model.package.serialNumber;
                 this.persistPack(pack, (err) => {
                     if(err){
                         this.showError(err, "Persist Package failed.");
