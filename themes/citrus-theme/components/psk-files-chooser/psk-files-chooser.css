@@ -1,0 +1,16 @@
+input[type=file].form-control-sm {
+    padding-left: 0;
+    display: none;
+}
+
+label {
+    cursor: pointer;
+}
+
+.leaflet-files-chooser .fileDiv {
+    margin: 5px 0;
+}
+
+.leaflet-files-chooser .fileDiv button {
+    padding: 0.375rem 0.75rem !important;
+}

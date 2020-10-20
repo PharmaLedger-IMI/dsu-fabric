@@ -6,7 +6,8 @@ export default class Product {
 	photo = "assets/images/default.png";
 	description = "";
 	leaflet = "";
-	manufName = "Novartis Pharmaceuticals Corporation"
+	manufName = "Novartis Pharmaceuticals Corporation";
+	files = [];
 
 	constructor(product) {
 		if(typeof product !== undefined){
