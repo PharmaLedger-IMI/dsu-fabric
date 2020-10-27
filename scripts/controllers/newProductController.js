@@ -34,7 +34,7 @@ export default class newProductController extends ContainerController {
         });
 
         this.on("leaflet-selected", (event) => {
-            this.leafletFile = event.data[0];
+            this.leafletFiles = event.data;
         });
 
         this.on('openFeedback', (e) => {
@@ -87,7 +87,7 @@ export default class newProductController extends ContainerController {
                         if (err) {
                             return callback(err);
                         }
-                        dsuBuilder.addFileDataToDossier(transactionId, LEAFLET_ATTACHMENT_FILE, this.leafletFile, (err) => {
+                        this.uploadLifletFiles(transactionId, this.leafletFiles, (err, data) => {
                             if (err) {
                                 return callback(err);
                             }
@@ -96,7 +96,52 @@ export default class newProductController extends ContainerController {
                     });
                 });
             });
+        });
+    }
 
+    uploadFile(transactionId, filename, file, callback) {
+        dsuBuilder.addFileDataToDossier(transactionId, filename, file, (err, data) => {
+            if (err) {
+                return callback(err);
+            }
+            callback(undefined, data);
+        });
+    }
+
+    uploadLifletFiles(transactionId, files, callback) {
+        if (files === undefined || files === null) {
+            return callback(undefined, []);
+        }
+        let xmlFiles = files.filter((file) => file.name.endsWith('.xml'))
+        if (xmlFiles.length === 0) {
+            return callback(new Error("No xml files found."))
+        }
+        let anyOtherFiles = files.filter((file) => !file.name.endsWith('.xml'))
+        let responses = [];
+
+        this.uploadFile(transactionId, LEAFLET_ATTACHMENT_FILE, xmlFiles[0], (err, data) => {
+            if (err) {
+                return callback(err);
+            }
+            responses.push(data);
+            let uploadFilesRecursive = (file) => {
+                this.uploadFile(transactionId, file.name, file, (err, data) => {
+                    if (err) {
+                        return callback(err);
+                    }
+                    responses.push(data);
+                    if (anyOtherFiles.length > 0) {
+                        uploadFilesRecursive(anyOtherFiles.shift())
+                    } else {
+                        return callback(undefined, responses);
+                    }
+                });
+            }
+
+            if (anyOtherFiles.length > 0) {
+                return uploadFilesRecursive(anyOtherFiles.shift());
+            }
+            return callback(undefined, responses);
         });
     }
 

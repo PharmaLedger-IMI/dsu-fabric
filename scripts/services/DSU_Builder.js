@@ -1,4 +1,5 @@
 import utils from "./utils.js";
+
 const doPost = utils.getPostHandlerFor("dsuWizard");
 
 export default class DSU_Builder {
@@ -19,7 +20,7 @@ export default class DSU_Builder {
         doPost(url, keyssi, callback);
     }
 
-    setGtinSSI(transactionId, dlDomain, gtin, batch, expiration, callback){
+    setGtinSSI(transactionId, dlDomain, gtin, batch, expiration, callback) {
         const body = {dlDomain, gtin, batch, expiration}
         const url = `/gtin/${transactionId}`;
         doPost(url, JSON.stringify(body), callback);
@@ -28,18 +29,17 @@ export default class DSU_Builder {
     addFileDataToDossier(transactionId, fileName, fileData, callback) {
         const url = `/addFile/${transactionId}`;
 
-        /*if(fileData instanceof File){*/
-            let body = new FormData();
-            let inputType = "file";
-            body.append(inputType, fileData);
-        /*}else{
-           body = fileData;
-        }*/
+        if (fileData instanceof ArrayBuffer) {
+            fileData = new Blob([new Uint8Array(fileData)], {type: "application/octet-stream"});
+        }
+        let body = new FormData();
+        let inputType = "file";
+        body.append(inputType, fileData);
 
         doPost(url, body, {headers: {"x-dossier-path": fileName}}, callback);
     }
 
-    mount(transactionId, path, seed, callback){
+    mount(transactionId, path, seed, callback) {
         const url = `/mount/${transactionId}`;
         doPost(url, "", {
             headers: {
