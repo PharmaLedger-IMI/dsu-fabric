@@ -17,7 +17,7 @@ export default class Product {
 		}
 
 		if (this.gtin === "") {
-			this.gtin = Utils.generateNumericID(14);
+			this.gtin = '05290931025615';
 		}
 	}
 
