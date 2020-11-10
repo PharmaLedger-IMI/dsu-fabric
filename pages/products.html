@@ -1,20 +1,31 @@
 <psk-page title="Products">
-    <psk-form controller-name="ProductsController">
+    <psk-container controller-name="ProductsController">
         <psk-condition condition="@productsListLoaded">
             <psk-for-each slot="condition-true" data-view-model="products">
-                <psk-form-row columns="4" layout="xs=[2,3,1,6] s=[2,3,1,6] m=[2,3,1,6] l=[2,3,1,6] xl=[2,3,1,6]" class="withSeparator">
-                    <psk-label label="Product name"></psk-label>
-                    <b><psk-label label="@name"></psk-label></b>
-                    <psk-label label="KeySSI"></psk-label>
-                    <psk-text-input value="@keySSI" read-only></psk-text-input>
-                </psk-form-row>
+                <psk-layout template-columns="1fr 1fr 1fr 1fr">
+                    <psk-layout-item onclick="this.dispatchEvent(new Event('edit-product'))" gtin="@gtin">
+                        <psk-label label="Product name:"></psk-label>
+                    </psk-layout-item>
+                    <psk-layout-item onclick="this.dispatchEvent(new Event('edit-product'))" gtin="@gtin">
+                        <b>
+                            <psk-label label="@name"></psk-label>
+                        </b>
+                    </psk-layout-item>
+
+                    <psk-layout-item onclick="this.dispatchEvent(new Event('edit-product'))" gtin="@gtin">
+                        <psk-label label="GTIN"></psk-label>
+                    </psk-layout-item>
+                    <psk-layout-item onclick="this.dispatchEvent(new Event('edit-product'))" gtin="@gtin">
+                        <b><psk-label label="@gtin"></psk-label></b>
+                    </psk-layout-item>
+                </psk-layout>
                 <div slot="no-data">No Products.</div>
             </psk-for-each>
             <div slot="condition-false">
-                Product list loading...
+                <psk-ui-loader slot="condition-true" should-be-rendered="true"></psk-ui-loader>
             </div>
         </psk-condition>
         <div style="min-height: 30px;"></div>
         <psk-button event-name="add-product" label="Add Product"></psk-button>
-    </psk-form>
+    </psk-container>
 </psk-page>

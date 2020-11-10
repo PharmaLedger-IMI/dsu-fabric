@@ -1,16 +1,20 @@
 <psk-page title="Add batch">
     <psk-form controller-name="addBatchController">
         <psk-form-row>
-            <psk-text-input label="Batch number" value="@batch.batchNumber" read-only></psk-text-input>
+            <psk-text-input label="Batch number" value="@batch.batchNumber" required></psk-text-input>
         </psk-form-row>
         <psk-form-row>
-            <psk-select view-model="@products" value="@batch.product" required></psk-select>
+            <psk-select view-model="@products"  required></psk-select>
         </psk-form-row>
         <psk-form-row>
-            <psk-select view-model="@countries" value="@batch.country" required></psk-select>
+            <psk-select view-model="@versions" required></psk-select>
         </psk-form-row>
         <psk-form-row>
-            <psk-date-input data-format="DD MM YYYY" label="Expiration date" placeholder="YYYY-MM-DD" value="@batch.expiration" ></psk-date-input>
+            <psk-date-input data-format="DD MM YYYY" label="Expiration date" value="@batch.expiration" required></psk-date-input>
+        </psk-form-row>
+        <psk-form-row>
+            <psk-textarea label="Serial numbers" value="@batch.serialNumbers" required>
+            </psk-textarea>
         </psk-form-row>
         <psk-form-row>
             <psk-button label="Add batch" event-name="add-batch"></psk-button>

@@ -2,8 +2,8 @@ import Utils from "./Utils.js";
 export default class Batch {
     batchNumber;
     expiration;
-    product;
-    country;
+    version = 1;
+    serialNumbers = "430239925150";
 
     constructor(batch) {
         if (typeof batch !== undefined) {
@@ -30,13 +30,6 @@ export default class Batch {
             errors.push('Expiration date is required.');
         }
 
-        if (!this.product) {
-            errors.push('Product is required.');
-        }
-
-        if (!this.country) {
-            errors.push('Country is required.');
-        }
         return errors.length === 0 ? true : errors;
     }
 }

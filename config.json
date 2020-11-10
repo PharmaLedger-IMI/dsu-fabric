@@ -2,8 +2,7 @@
   "theme": "citrus-theme",
   "appVersion": "1.0.0-alpha",
   "profile": {
-    "username": "Worker",
-    "email": "prod.user@novartis.com",
-    "avatar": "assets/images/production_worker_avatar.jpg"
+    "username": "DSU Fabric",
+    "avatar": "assets/images/factory.png"
   }
 }

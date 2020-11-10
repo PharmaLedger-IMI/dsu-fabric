@@ -1,6 +1,8 @@
 export default {
     'PACKAGES_STORAGE_PATH': "/app/data/packages.json",
     'PRODUCTS_STORAGE_PATH': "/app/data/products.json",
+    'PRODUCT_KEYSSI_STORAGE_PATH': "/app/data/productKeySSIs.json",
+    'BATCH_KEYSSI_STORAGE_PATH': "/app/data/batchKeySSIs.json",
     'BATCHES_STORAGE_PATH': "/app/data/batches.json",
     'DOMAIN_NAME': "default",
     'PRODUCT_DSU_MOUNT_POINT': "/product",

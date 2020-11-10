@@ -10,20 +10,13 @@
   },
   "pages": [
     {
-      "name": "Packages"
+      "name": "Products"
     },
     {
       "name": "Batches"
     },
     {
-      "name": "Products"
-    },
-    {
       "name": "Add batch",
-      "indexed": false
-    },
-    {
-      "name": "Create package",
       "indexed": false
     },
     {
