@@ -1,17 +1,22 @@
 <psk-page title="Manage Product">
     <psk-container controller-name="ManageProductController">
         <psk-text-input label="GTIN" value="@product.gtin" required></psk-text-input>
-        <psk-text-input label="Version" value="@product.version" read-only></psk-text-input>
         <psk-text-input label="Manufacturer name" value="@product.manufName"></psk-text-input>
         <psk-text-input label="Name" value="@product.name" required></psk-text-input>
         <psk-select view-model="@languages" value="@product.language" required></psk-select>
         <psk-textarea label="Description" value="@product.description" required></psk-textarea>
         <psk-img-input src="@product.photo" event-name="product-photo-selected" label="Photo"></psk-img-input>
-        <psk-label label="Leaflet"></psk-label>
-        <psk-files-chooser accept="directory"
-                           label="Attach Leaflet" list-files="true"
-                           event-name="leaflet-selected" class="paperclip leaflet-files-chooser" required>
-        </psk-files-chooser>
+        <psk-form class="product-leaflet">
+            <div>
+                <psk-label label="Leaflet"></psk-label>
+                <psk-files-chooser accept="directory" label="Attach Leaflet" list-files="true"
+                                   event-name="leaflet-selected" class="paperclip leaflet-files-chooser" required>
+                </psk-files-chooser>
+            </div>
+            <div class="product-leaflet-version">
+                <psk-text-input label="Version" value="@product.version" read-only></psk-text-input>
+            </div>
+        </psk-form>
         <psk-label label="@attachment.name" class="inline"></psk-label>
         <psk-button label="Save Product" event-name="add-product"></psk-button>
         <psk-list-feedbacks></psk-list-feedbacks>
