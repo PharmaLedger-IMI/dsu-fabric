@@ -5,12 +5,18 @@ input[type=file].form-control-sm {
 
 label {
     cursor: pointer;
+    margin-bottom: 0 !important;
 }
 
-.leaflet-files-chooser .fileDiv {
-    margin: 5px 0;
+.fileDiv {
+    padding-top: 0.5rem;
 }
 
-.leaflet-files-chooser .fileDiv button {
-    padding: 0.375rem 0.75rem !important;
+.fileDiv button {
+    width: 45px;
+    height: 45px;
+}
+
+.fileDiv p {
+    margin: 0.5rem 0;
 }

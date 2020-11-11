@@ -27,7 +27,6 @@ export default class ManageProductController extends ContainerController {
                 throw err;
             }
             this.products = products;
-            debugger;
             if (typeof this.productIndex !== "undefined") {
                 const productVersions = Object.values(this.products[this.productIndex])[0];
                 this.model.product = new Product(productVersions[productVersions.length - 1]);
@@ -86,7 +85,6 @@ export default class ManageProductController extends ContainerController {
     }
 
     incrementVersionForExistingProduct() {
-        debugger;
         if (typeof this.productIndex === "undefined" && typeof this.products !== "undefined" && this.products !== null) {
             const products = this.products.map(product => {
                 return Object.keys(product)[0];
