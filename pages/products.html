@@ -2,7 +2,7 @@
     <psk-container controller-name="ProductsController">
         <psk-condition condition="@productsListLoaded">
             <psk-for-each slot="condition-true" data-view-model="products">
-                <psk-layout template-columns="1fr 1fr 1fr 1fr">
+                <psk-layout class="product-line" template-columns="1fr 1fr 1fr 1fr">
                     <psk-layout-item onclick="this.dispatchEvent(new Event('edit-product'))" gtin="@gtin">
                         <psk-label label="Product name:"></psk-label>
                     </psk-layout-item>
