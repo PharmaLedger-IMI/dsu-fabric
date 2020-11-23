@@ -178,79 +178,46 @@ export default class ManageProductController extends ContainerController {
                 return callback(err);
             }
 
-            const basePath = '/' + product.version;
-            product.photo = basePath + PRODUCT_IMAGE_FILE;
-            product.leaflet = basePath + LEAFLET_ATTACHMENT_FILE;
-            const productStorageFile = basePath + PRODUCT_STORAGE_FILE;
-            const addFilesToDSU = (callback) => {
-                dsuBuilder.addFileDataToDossier(transactionId, productStorageFile, JSON.stringify(product), (err) => {
-                    if (err) {
-                        return callback(err);
-                    }
-                    dsuBuilder.addFileDataToDossier(transactionId, product.photo, this.productPhoto, (err) => {
-                        if (err) {
-                            return callback(err);
-                        }
-
-                        let languageTypeCards = this.model.languageTypeCards;
-                        let uploadFilesForLanguageAndType = (languageAndTypeCard) => {
-                            if (languageAndTypeCard.files.length === 0) {
-                                if (languageTypeCards.length > 0) {
-                                    uploadFilesForLanguageAndType(languageTypeCards.shift())
-                                } else {
-                                    return dsuBuilder.buildDossier(transactionId, callback);
-                                }
-                            }
-
-                            let uploadPath = `${basePath}/${languageAndTypeCard.type.value}/${languageAndTypeCard.language.value}`;
-                            this.uploadAttachmentFiles(transactionId, uploadPath, languageAndTypeCard.type.value, languageAndTypeCard.files, (err, data) => {
-                                if (err) {
-                                    return callback(err);
-                                }
-                                if (languageTypeCards.length > 0) {
-                                    uploadFilesForLanguageAndType(languageTypeCards.shift())
-                                } else {
-                                    return dsuBuilder.buildDossier(transactionId, callback);
-                                }
-                            });
-                        }
-                        return uploadFilesForLanguageAndType(languageTypeCards.shift())
-                    });
-                });
-
-            };
-
             if (product.version > 1) {
-                storage.getItem(constants.PRODUCT_KEYSSI_STORAGE_PATH, "json", (err, keySSIs) => {
-                    if (err) {
-                        return callback(err);
-                    }
-
-                    dsuBuilder.setKeySSI(transactionId, keySSIs[product.gtin], (err) => {
-                        if (err) {
-                            return callback(err);
-                        }
-
-                        addFilesToDSU(callback);
-                    });
-                });
+                this.updateProductDSU(transactionId, product, callback);
             } else {
-                dsuBuilder.setDLDomain(transactionId, DOMAIN_NAME, (err) => {
-                    if (err) {
-                        return callback(err);
-                    }
-
-                    addFilesToDSU((err, keySSI) => {
-                        if (err) {
-                            return callback(err);
-                        }
-
-                        this.persistKeySSI(keySSI, product.gtin, err => callback(err, keySSI));
-                    });
-                });
+                this.createProductDSU(transactionId, product, callback);
             }
         });
     }
+
+    createProductDSU(transactionId, product, callback) {
+        dsuBuilder.setDLDomain(transactionId, DOMAIN_NAME, (err) => {
+            if (err) {
+                return callback(err);
+            }
+
+            this.addProductFilesToDSU(transactionId, product, (err, keySSI) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                this.persistKeySSI(keySSI, product.gtin, err => callback(err, keySSI));
+            });
+        });
+    }
+
+    updateProductDSU(transactionId, product, callback) {
+        this.DSUStorage.getItem(constants.PRODUCT_KEYSSI_STORAGE_PATH, "json", (err, keySSIs) => {
+            if (err) {
+                return callback(err);
+            }
+
+            dsuBuilder.setKeySSI(transactionId, keySSIs[product.gtin], (err) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                this.addProductFilesToDSU(transactionId, product, callback);
+            });
+        });
+    }
+
 
     uploadFile(transactionId, filename, file, callback) {
         dsuBuilder.addFileDataToDossier(transactionId, filename, file, (err, data) => {
@@ -259,6 +226,48 @@ export default class ManageProductController extends ContainerController {
             }
             callback(undefined, data);
         });
+    }
+
+    addProductFilesToDSU(transactionId, product, callback) {
+        const basePath = '/' + product.version;
+        product.photo = basePath + PRODUCT_IMAGE_FILE;
+        product.leaflet = basePath + LEAFLET_ATTACHMENT_FILE;
+        const productStorageFile = basePath + PRODUCT_STORAGE_FILE;
+        dsuBuilder.addFileDataToDossier(transactionId, productStorageFile, JSON.stringify(product), (err) => {
+            if (err) {
+                return callback(err);
+            }
+            dsuBuilder.addFileDataToDossier(transactionId, product.photo, this.productPhoto, (err) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                let languageTypeCards = this.model.languageTypeCards;
+                let uploadFilesForLanguageAndType = (languageAndTypeCard) => {
+                    if (languageAndTypeCard.files.length === 0) {
+                        if (languageTypeCards.length > 0) {
+                            uploadFilesForLanguageAndType(languageTypeCards.shift())
+                        } else {
+                            return dsuBuilder.buildDossier(transactionId, callback);
+                        }
+                    }
+
+                    let uploadPath = `${basePath}/${languageAndTypeCard.type.value}/${languageAndTypeCard.language.value}`;
+                    this.uploadAttachmentFiles(transactionId, uploadPath, languageAndTypeCard.type.value, languageAndTypeCard.files, (err, data) => {
+                        if (err) {
+                            return callback(err);
+                        }
+                        if (languageTypeCards.length > 0) {
+                            uploadFilesForLanguageAndType(languageTypeCards.shift())
+                        } else {
+                            return dsuBuilder.buildDossier(transactionId, callback);
+                        }
+                    });
+                }
+                return uploadFilesForLanguageAndType(languageTypeCards.shift())
+            });
+        });
+
     }
 
     uploadAttachmentFiles(transactionId, basePath, attachmentType, files, callback) {
