@@ -11,6 +11,7 @@ const PRODUCT_STORAGE_FILE = constants.PRODUCT_STORAGE_FILE;
 const PRODUCT_IMAGE_FILE = constants.PRODUCT_IMAGE_FILE;
 const LEAFLET_ATTACHMENT_FILE = constants.LEAFLET_ATTACHMENT_FILE;
 const DOMAIN_NAME = constants.DOMAIN_NAME;
+const SMPC_ATACHMENT_FILE = constants.SMPC_ATACHMENT_FILE;
 
 export default class ManageProductController extends ContainerController {
     constructor(element, history) {
@@ -202,7 +203,7 @@ export default class ManageProductController extends ContainerController {
                             }
 
                             let uploadPath = `${basePath}/${languageAndTypeCard.type.value}/${languageAndTypeCard.language.value}`;
-                            this.uploadLeafletFiles(transactionId, uploadPath, languageAndTypeCard.files, (err, data) => {
+                            this.uploadAttachmentFiles(transactionId, uploadPath, languageAndTypeCard.type.value, languageAndTypeCard.files, (err, data) => {
                                 if (err) {
                                     return callback(err);
                                 }
@@ -260,7 +261,7 @@ export default class ManageProductController extends ContainerController {
         });
     }
 
-    uploadLeafletFiles(transactionId, basePath, files, callback) {
+    uploadAttachmentFiles(transactionId, basePath, attachmentType, files, callback) {
         if (files === undefined || files === null) {
             return callback(undefined, []);
         }
@@ -270,7 +271,12 @@ export default class ManageProductController extends ContainerController {
         }
         let anyOtherFiles = files.filter((file) => !file.name.endsWith('.xml'))
         let responses = [];
-        this.uploadFile(transactionId, basePath + LEAFLET_ATTACHMENT_FILE, xmlFiles[0], (err, data) => {
+        const uploadTypeConfig = {
+            "leaflet": LEAFLET_ATTACHMENT_FILE,
+            "smpc": SMPC_ATACHMENT_FILE
+        }
+
+        this.uploadFile(transactionId, basePath + uploadTypeConfig[attachmentType], xmlFiles[0], (err, data) => {
             if (err) {
                 return callback(err);
             }
