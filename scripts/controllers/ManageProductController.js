@@ -4,6 +4,7 @@ import Languages from "../models/Languages.js";
 import constants from '../constants.js';
 import storage from '../services/Storage.js';
 import DSU_Builder from '../services/DSU_Builder.js';
+import UploadTypes from "../models/UploadTypes.js";
 
 const dsuBuilder = new DSU_Builder();
 const PRODUCT_STORAGE_FILE = constants.PRODUCT_STORAGE_FILE;
@@ -21,6 +22,16 @@ export default class ManageProductController extends ContainerController {
             placeholder: "Select a language",
             options: Languages.getListAsVM()
         };
+
+        this.model.languageTypeCards = []
+
+        this.on("delete-language-leaflet", (event) => {
+            this.model.languageTypeCards = this.model.languageTypeCards.filter(lf => !(lf.type.value === event.data.type.value && lf.language.value === event.data.language.value));
+        });
+
+        this.on("add-language-leaflet", (event) => {
+            this.addLanguageTypeFilesListener(event)
+        });
 
         storage.getItem(constants.PRODUCTS_STORAGE_PATH, "json", (err, products) => {
             if (err) {
@@ -40,10 +51,6 @@ export default class ManageProductController extends ContainerController {
             this.productPhoto = event.data;
         });
 
-        this.on("leaflet-selected", (event) => {
-            this.leafletFiles = event.data;
-        });
-
         this.on('openFeedback', (e) => {
             this.feedbackEmitter = e.detail;
         });
@@ -53,19 +60,14 @@ export default class ManageProductController extends ContainerController {
         })
 
         this.on("add-product", (event) => {
-            if (typeof this.leafletFiles === "undefined" || this.leafletFiles.length === 0) {
-                return this.showError("Cannot save the product because a leaflet was not provided.");
-            }
-            this.incrementVersionForExistingProduct();
             let product = this.model.product;
-            let validationResult = product.validate();
-            if (Array.isArray(validationResult)) {
-                for (let i = 0; i < validationResult.length; i++) {
-                    let err = validationResult[i];
-                    this.showError(err);
-                }
+
+            if (!this.isValid(product)) {
                 return;
             }
+
+            this.incrementVersionForExistingProduct();
+
             this.buildProductDSU(product, (err, keySSI) => {
                 if (err) {
                     return this.showError(err, "Product DSU build failed.");
@@ -82,6 +84,77 @@ export default class ManageProductController extends ContainerController {
                 });
             });
         });
+    }
+
+    addLanguageTypeFilesListener(event) {
+        let actionModalModel = {
+            title: "Choose language and type of upload",
+            acceptButtonText: 'Accept',
+            denyButtonText: 'Cancel',
+            languages: {
+                label: "Language",
+                placeholder: "Select a language",
+                options: Languages.getListAsVM()
+            },
+            types: {
+                label: "Type",
+                placeholder: "Select a type",
+                options: UploadTypes.getListAsVM()
+            },
+            product: {
+                language: "en",
+                type: "leaflet"
+            }
+        }
+        this.showModal('selectLanguageAndType', actionModalModel, (err, response) => {
+            if (err || response === undefined) {
+                return;
+            }
+            if (this.typeAndLanguageExist(response.language, response.type)) {
+                return alert('This language and type combo already exist.');
+            }
+            let selectedLanguage = Languages.getListAsVM().find(lang => lang.value === response.language);
+            let selectedType = UploadTypes.getListAsVM().find(type => type.value === response.type);
+            let eventName = `select-files-${response.language}-${response.type}`;
+            this.model.languageTypeCards.push({
+                type: selectedType,
+                language: selectedLanguage,
+                attachLabel: `Upload ${selectedType.label}`,
+                fileSelectEvent: eventName,
+                files: []
+            });
+
+            this.on(eventName, (event) => {
+                const eventNameParts = event.type.split('-');
+                const language = eventNameParts[2];
+                const type = eventNameParts[3];
+                this.model.languageTypeCards.find(lf => lf.type.value === type && lf.language.value === language).files = event.data;
+            });
+        });
+    }
+
+    typeAndLanguageExist(language, type) {
+        return this.model.languageTypeCards.findIndex(lf => lf.type.value === type && lf.language.value === language) !== -1;
+    }
+
+    filesWereProvided() {
+        return this.model.languageTypeCards.filter(lf => lf.files.length > 0).length > 0;
+    }
+
+    isValid(product) {
+        if (!this.filesWereProvided()) {
+            this.showError("Cannot save the product because a leaflet was not provided.");
+            return false;
+        }
+        let validationResult = product.validate();
+        if (Array.isArray(validationResult)) {
+            for (let i = 0; i < validationResult.length; i++) {
+                let err = validationResult[i];
+                this.showError(err);
+            }
+            return false;
+        }
+        return true;
     }
 
     incrementVersionForExistingProduct() {
@@ -104,7 +177,7 @@ export default class ManageProductController extends ContainerController {
                 return callback(err);
             }
 
-            const basePath = '/' + product.version + '/' + product.language;
+            const basePath = '/' + product.version;
             product.photo = basePath + PRODUCT_IMAGE_FILE;
             product.leaflet = basePath + LEAFLET_ATTACHMENT_FILE;
             const productStorageFile = basePath + PRODUCT_STORAGE_FILE;
@@ -117,12 +190,30 @@ export default class ManageProductController extends ContainerController {
                         if (err) {
                             return callback(err);
                         }
-                        this.uploadLeafletFiles(transactionId, basePath, this.leafletFiles, (err, data) => {
-                            if (err) {
-                                return callback(err);
+
+                        let languageTypeCards = this.model.languageTypeCards;
+                        let uploadFilesForLanguageAndType = (languageAndTypeCard) => {
+                            if (languageAndTypeCard.files.length === 0) {
+                                if (languageTypeCards.length > 0) {
+                                    uploadFilesForLanguageAndType(languageTypeCards.shift())
+                                } else {
+                                    return dsuBuilder.buildDossier(transactionId, callback);
+                                }
                             }
-                            dsuBuilder.buildDossier(transactionId, callback);
-                        });
+
+                            let uploadPath = `${basePath}/${languageAndTypeCard.type.value}/${languageAndTypeCard.language.value}`;
+                            this.uploadLeafletFiles(transactionId, uploadPath, languageAndTypeCard.files, (err, data) => {
+                                if (err) {
+                                    return callback(err);
+                                }
+                                if (languageTypeCards.length > 0) {
+                                    uploadFilesForLanguageAndType(languageTypeCards.shift())
+                                } else {
+                                    return dsuBuilder.buildDossier(transactionId, callback);
+                                }
+                            });
+                        }
+                        return uploadFilesForLanguageAndType(languageTypeCards.shift())
                     });
                 });
 

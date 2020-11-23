@@ -4,5 +4,8 @@
   "profile": {
     "username": "DSU Fabric",
     "avatar": "assets/images/factory.png"
+  },
+  "modals": {
+    "selectLanguageAndType": "select-language-and-type-modal.html"
   }
 }
