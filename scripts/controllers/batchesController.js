@@ -19,7 +19,7 @@ export default class batchesController extends ContainerController {
         });
 
         this.on("add-batch", () => {
-            history.push("?add-batch");
+            this.History.navigateToPageByTag("add-batch");
         });
     }
 

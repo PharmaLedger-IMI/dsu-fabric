@@ -32,19 +32,18 @@ export default class ProductsController extends ContainerController {
 
 		this.on("add-product", (event)=>{
 			event.stopImmediatePropagation();
-			//this.History.navigateToPageByTag("manage-product");
-			history.push("?manage-product");
+			this.History.navigateToPageByTag("manage-product");
 		});
 
 		this.on('edit-product', (event) => {
 			let target = event.target;
 			let targetProduct = target.getAttribute("gtin");
 			const index = parseInt(targetProduct.replace(/\D/g, ''));
-			history.push("?manage-product", index);
+			this.History.navigateToPageByTag("manage-product", {index: index});
 		}, {capture: true});
 
 		this.on("view-drug", (event)=>{
-			history.push("?drug-details");
+			this.History.navigateToPageByTag("drug-details");
 		});
 
 		this.on('openFeedback', (e) => {

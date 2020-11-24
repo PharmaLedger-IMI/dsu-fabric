@@ -85,7 +85,7 @@ export default class addBatchController extends ContainerController {
                             }
 
                             console.log("Immutable DSU GtinSSI:", gtinSSI);
-                            history.push("?batches");
+                            this.History.navigateToPageByTag("batches");
                         });
                     });
                 });

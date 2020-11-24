@@ -22,7 +22,7 @@ export default class packagesController extends ContainerController {
         });
 
         this.on("create-package", () => {
-            history.push("?create-package");
+            this.History.navigateToPageByTag("create-package");
         });
     }
 

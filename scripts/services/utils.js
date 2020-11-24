@@ -21,7 +21,7 @@ function getPostHandlerFor(apiname){
 		}
 
 		const baseURL = getBaseURL();
-		url = `${baseURL}${url}`;
+		url = `${baseURL}${url}#x-blockchain-domain-request`;
 		fetch(url, {
 			method: 'POST',
 			headers: options.headers,

@@ -5,6 +5,7 @@ import constants from '../constants.js';
 import storage from '../services/Storage.js';
 import DSU_Builder from '../services/DSU_Builder.js';
 import UploadTypes from "../models/UploadTypes.js";
+import LogService from '../services/LogService.js';
 
 const dsuBuilder = new DSU_Builder();
 const PRODUCT_STORAGE_FILE = constants.PRODUCT_STORAGE_FILE;
@@ -17,7 +18,8 @@ export default class ManageProductController extends ContainerController {
     constructor(element, history) {
         super(element, history);
         this.setModel({});
-        this.productIndex = this.History.getState();
+        let state = this.History.getState();
+        this.productIndex = state !== undefined ? state.index : undefined;
         this.model.languages = {
             label: "Language",
             placeholder: "Select a language",
@@ -80,8 +82,7 @@ export default class ManageProductController extends ContainerController {
                         this.showError(err, "Product keySSI failed to be stored.");
                         return;
                     }
-
-                    history.push("?products");
+                    this.History.navigateToPageByTag("products");
                 });
             });
         });
@@ -324,6 +325,10 @@ export default class ManageProductController extends ContainerController {
             prodElement[product.gtin] = [product];
             this.products.push(prodElement);
         }
+        LogService.log({
+            ...product,
+            action: "created product"
+        });
         storage.setItem(constants.PRODUCTS_STORAGE_PATH, JSON.stringify(this.products), callback);
     }
 

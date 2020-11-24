@@ -80,7 +80,7 @@ export default class createPackageController extends ContainerController {
                     if(err){
                         this.showError(err, "Persist Package failed.");
                     }
-                    history.push("?packages");
+                    this.History.navigateToPageByTag("packages");
                 });
             });
         });
