@@ -2,15 +2,17 @@
     <psk-container controller-name="AuditController">
         <psk-condition condition="@logListLoaded">
             <div slot="condition-true">
-                <psk-layout class="audit-header" template-columns="1fr 1fr 1fr 1fr 1fr 1fr 1fr">
-                    <psk-label label="Type"></psk-label>
-                    <psk-label label="User"></psk-label>
-                    <psk-label label="Action"></psk-label>
-                    <psk-label label="GTIN"></psk-label>
-                    <psk-label label="Version"></psk-label>
-                    <psk-label label="Timestamp"></psk-label>
-                    <psk-label label="KeySSI"></psk-label>
-                </psk-layout>
+                <psk-condition condition="@listHeader">
+                    <psk-layout slot="condition-true" class="audit-header" template-columns="1fr 1fr 1fr 1fr 1fr 1fr 1fr">
+                        <psk-label label="Type"></psk-label>
+                        <psk-label label="User"></psk-label>
+                        <psk-label label="Action"></psk-label>
+                        <psk-label label="GTIN"></psk-label>
+                        <psk-label label="Version"></psk-label>
+                        <psk-label label="Timestamp"></psk-label>
+                        <psk-label label="KeySSI"></psk-label>
+                    </psk-layout>
+                </psk-condition>
                 <hr>
                 <psk-for-each data-view-model="logs">
                     <psk-layout class="audit-line" template-columns="1fr 1fr 1fr 1fr 1fr 1fr 1fr">

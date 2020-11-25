@@ -11,6 +11,10 @@ export default class AuditController extends ContainerController {
             return typeof this.model.logs !== "undefined";
         }, 'logs');
 
+        this.model.addExpression('listHeader', () => {
+            return typeof this.model.logs !== "undefined" && this.model.logs.length > 0;
+        }, 'logs');
+
         this.on("show-keySSI", (event) => {
             this.showModal('viewKeySSIModal', {keySSI: event.data}, () => {});
         });
