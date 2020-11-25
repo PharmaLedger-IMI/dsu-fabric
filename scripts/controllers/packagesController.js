@@ -27,7 +27,7 @@ export default class packagesController extends ContainerController {
     }
 
     generateSerializationForPack(pack) {
-        let serialization = `(01)${pack.gtin}(21)${pack.serialNumber}(10)${pack.batch}(17)${pack.expiration}`;
+        let serialization = `(01)${pack.gtin}(21)${pack.serialNumber}(10)${pack.batch}(17)${pack.expiryForDisplay}`;
         return serialization;
     }
 }
