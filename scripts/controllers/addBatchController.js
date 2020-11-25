@@ -38,7 +38,7 @@ export default class addBatchController extends ContainerController {
 
         this.on("add-batch", () => {
             let batch = this.model.batch;
-            batch.expiry = utils.convertDateToISO(batch.expiry);
+            batch.expiry = utils.convertDateToISO(batch.expiration);
             storage.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
                 if (typeof batches !== "undefined" && batches !== null) {
                     this.batches = batches;
