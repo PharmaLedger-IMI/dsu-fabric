@@ -12,7 +12,7 @@ export default class AuditController extends ContainerController {
         }, 'logs');
 
         this.on("show-keySSI", (event) => {
-            this.showModal('viewKeySSIModal', {keySSI: event.data});
+            this.showModal('viewKeySSIModal', {keySSI: event.data}, () => {});
         });
 
         LogService.getLogs((err, logs) => {

@@ -15,5 +15,6 @@ export default class ViewKeySSIController extends ModalController {
 
     _finishProcess(event) {
         event.stopImmediatePropagation();
+        this.responseCallback();
     };
 }

@@ -1,7 +1,7 @@
 import Utils from "./Utils.js";
 export default class Batch {
     batchNumber;
-    expiration;
+    expiry;
     version = 1;
     serialNumbers = "430239925150";
 
@@ -26,7 +26,7 @@ export default class Batch {
             errors.push('Lot number is required.');
         }
 
-        if (!this.expiration) {
+        if (!this.expiry) {
             errors.push('Expiration date is required.');
         }
 
