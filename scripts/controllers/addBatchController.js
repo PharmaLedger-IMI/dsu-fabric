@@ -4,6 +4,7 @@ import Batch from "../models/Batch.js";
 import storage from "../services/Storage.js";
 import DSU_Builder from "../services/DSU_Builder.js";
 import Languages from "../models/Languages.js";
+import LogService from "../services/LogService.js";
 
 const dsuBuilder = new DSU_Builder();
 
@@ -72,6 +73,12 @@ export default class addBatchController extends ContainerController {
                         return this.showError(err, "Batch DSU build failed.");
                     }
                     batch.keySSI = keySSI;
+
+                    LogService.log({
+                        ...batch,
+                        action: "created batch",
+                        logType: 'BATCH_LOG'
+                    });
 
                     this.persistBatch(batch, (err) => {
                         if (err) {

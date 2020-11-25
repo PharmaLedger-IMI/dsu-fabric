@@ -1,17 +1,33 @@
 <psk-page title="Audit">
     <psk-container controller-name="AuditController">
         <psk-condition condition="@logListLoaded">
-            <psk-for-each slot="condition-true" data-view-model="logs">
-                <psk-layout class="product-line" template-columns="1fr 1fr 1fr 1fr 1fr 1fr">
+            <div slot="condition-true">
+                <psk-layout class="audit-header" template-columns="1fr 1fr 1fr 1fr 1fr 1fr 1fr">
+                    <psk-label label="Type"></psk-label>
                     <psk-label label="User"></psk-label>
-                    <psk-label label="@user"></psk-label>
-                    <psk-label label="@action"></psk-label>
-                    <psk-label label="@name"></psk-label>
-                    <psk-label label="at timestamp"></psk-label>
-                    <psk-label label="@timestamp"></psk-label>
+                    <psk-label label="Action"></psk-label>
+                    <psk-label label="GTIN"></psk-label>
+                    <psk-label label="Version"></psk-label>
+                    <psk-label label="Timestamp"></psk-label>
+                    <psk-label label="KeySSI"></psk-label>
                 </psk-layout>
-                <div slot="no-data">No logs available.</div>
-            </psk-for-each>
+                <hr>
+                <psk-for-each data-view-model="logs">
+                    <psk-layout class="audit-line" template-columns="1fr 1fr 1fr 1fr 1fr 1fr 1fr">
+                        <psk-label label="@logType"></psk-label>
+                        <psk-label label="@user"></psk-label>
+                        <psk-label label="@action"></psk-label>
+                        <psk-label label="@gtin"></psk-label>
+                        <psk-label label="@version"></psk-label>
+                        <psk-label label="@timestamp"></psk-label>
+                        <psk-button class="audit-keyssi-button" event-data="@keySSI" event-name="show-keySSI">
+                            <psk-icon icon="eye"></psk-icon>
+                            View
+                        </psk-button>
+                    </psk-layout>
+                    <div slot="no-data">No logs available.</div>
+                </psk-for-each>
+            </div>
             <div slot="condition-false">
                 <psk-ui-loader slot="condition-true" should-be-rendered="true"></psk-ui-loader>
             </div>

@@ -1,6 +1,4 @@
 import ContainerController from "../../cardinal/controllers/base-controllers/ContainerController.js";
-import constants from "../constants.js";
-import storage from "../services/Storage.js";
 import LogService from "../services/LogService.js";
 
 export default class AuditController extends ContainerController {
@@ -9,12 +7,16 @@ export default class AuditController extends ContainerController {
 
         this.setModel({});
 
-        this.model.addExpression('logListLoaded',  () => {
+        this.model.addExpression('logListLoaded', () => {
             return typeof this.model.logs !== "undefined";
         }, 'logs');
 
+        this.on("show-keySSI", (event) => {
+            this.showModal('viewKeySSIModal', {keySSI: event.data});
+        });
+
         LogService.getLogs((err, logs) => {
-            if(err){
+            if (err) {
                 //todo: implement better error handling
                 //throw err;
             }

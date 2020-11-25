@@ -6,6 +6,7 @@
     "avatar": "assets/images/factory.png"
   },
   "modals": {
-    "selectLanguageAndType": "select-language-and-type-modal.html"
+    "selectLanguageAndType": "select-language-and-type-modal.html",
+    "viewKeySSIModal": "view-keyssi-modal.html"
   }
 }

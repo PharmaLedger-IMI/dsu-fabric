@@ -327,7 +327,8 @@ export default class ManageProductController extends ContainerController {
         }
         LogService.log({
             ...product,
-            action: "created product"
+            action: "created product",
+            logType: 'PRODUCT_LOG'
         });
         storage.setItem(constants.PRODUCTS_STORAGE_PATH, JSON.stringify(this.products), callback);
     }
