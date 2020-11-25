@@ -1,7 +1,7 @@
 import ContainerController from "../../cardinal/controllers/base-controllers/ContainerController.js";
-import Batch from "../models/Batch.js";
 import storage from "../services/Storage.js";
 import constants from "../constants.js";
+import utils from "../utils.js";
 
 export default class batchesController extends ContainerController {
     constructor(element, history) {
@@ -24,6 +24,7 @@ export default class batchesController extends ContainerController {
     }
 
     generateSerializationForBatch(batch) {
-        return `(01)${batch.gtin}(21)${batch.serialNumbers[0]}(10)${batch.batchNumber}(17)${batch.expiry}`;
+        const gs1Date = utils.convertDateFromISOToGS1Format(batch.expiry);
+        return `(01)${batch.gtin}(21)${batch.serialNumbers[0]}(10)${batch.batchNumber}(17)${gs1Date}`;
     }
 }

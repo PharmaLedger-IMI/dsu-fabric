@@ -3,8 +3,7 @@ import constants from "../constants.js";
 import Batch from "../models/Batch.js";
 import storage from "../services/Storage.js";
 import DSU_Builder from "../services/DSU_Builder.js";
-import Languages from "../models/Languages.js";
-
+import utils from "../utils.js";
 const dsuBuilder = new DSU_Builder();
 
 export default class addBatchController extends ContainerController {
@@ -37,7 +36,7 @@ export default class addBatchController extends ContainerController {
 
         this.on("add-batch", () => {
             let batch = this.model.batch;
-
+            batch.expiry = utils.convertDateToISO(batch.expiry);
             storage.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
                 if (typeof batches !== "undefined" && batches !== null) {
                     this.batches = batches;
@@ -61,11 +60,6 @@ export default class addBatchController extends ContainerController {
                     }
                     return;
                 }
-
-                const ye = new Intl.DateTimeFormat('en', {year: '2-digit'}).format(batch.expiration);
-                const mo = new Intl.DateTimeFormat('en', {month: '2-digit'}).format(batch.expiration);
-                const da = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(batch.expiration);
-                batch.expiry = `${ye}${mo}${da}`;
 
                 this.buildBatchDSU(batch, (err, keySSI) => {
                     if (err) {
@@ -162,7 +156,8 @@ export default class addBatchController extends ContainerController {
             if (err) {
                 return callback(err);
             }
-            dsuBuilder.setGtinSSI(transactionId, constants.DOMAIN_NAME, batch.gtin, batch.batchNumber, batch.expiry, (err) => {
+            const gs1Date = utils.convertDateFromISOToGS1Format(batch.expiry);
+            dsuBuilder.setGtinSSI(transactionId, constants.DOMAIN_NAME, batch.gtin, batch.batchNumber, gs1Date, (err) => {
                 if (err) {
                     return callback(err);
                 }
