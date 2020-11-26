@@ -41,7 +41,8 @@ export default class addBatchController extends ContainerController {
 
         this.on("add-batch", () => {
             let batch = this.model.batch;
-            batch.expiry = utils.convertDateToISO(batch.expiry);
+            batch.expiry = utils.convertDateToISO(batch.expiryForDisplay);
+            batch.expiry = utils.convertDateFromISOToGS1Format(batch.expiry);
             this.storageService.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
                 if (typeof batches !== "undefined" && batches !== null) {
                     this.batches = batches;
@@ -167,8 +168,12 @@ export default class addBatchController extends ContainerController {
             if (err) {
                 return callback(err);
             }
-            const gs1Date = utils.convertDateFromISOToGS1Format(batch.expiry);
-            dsuBuilder.setGtinSSI(transactionId, constants.DOMAIN_NAME, batch.gtin, batch.batchNumber, gs1Date, (err) => {
+
+            if(!batch.gtin || !batch.batchNumber || !batch.expiry){
+                alert("A mandatory field is missing");
+                return;
+            }
+            dsuBuilder.setGtinSSI(transactionId, constants.DOMAIN_NAME, batch.gtin, batch.batchNumber, batch.expiry, (err) => {
                 if (err) {
                     return callback(err);
                 }

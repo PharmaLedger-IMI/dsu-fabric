@@ -26,7 +26,6 @@ export default class batchesController extends ContainerController {
     }
 
     generateSerializationForBatch(batch) {
-        const gs1Date = utils.convertDateFromISOToGS1Format(batch.expiry);
-        return `(01)${batch.gtin}(21)${batch.serialNumbers[0]}(10)${batch.batchNumber}(17)${gs1Date}`;
+        return `(01)${batch.gtin}(21)${batch.serialNumbers[0]}(10)${batch.batchNumber}(17)${batch.expiry}`;
     }
 }

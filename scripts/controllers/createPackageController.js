@@ -42,7 +42,7 @@ export default class createPackageController extends ContainerController {
         this.model.onChange("batches.value", (event)=>{
             this.storageService.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
                 let batch = batches.find(batch => batch.batchNumber === this.model.batches.value);
-                this.model.expiration = batch.expiration;
+                this.model.expiryForDisplay = batch.expiryForDisplay;
                 this.model.country = Countries.getCountry(batch.country);
                 this.model.selectedBatch = batch;
 
@@ -64,11 +64,11 @@ export default class createPackageController extends ContainerController {
 
         this.on("save-package", (event) => {
             let pack = {gtin: this.model.gtin, batch: this.model.selectedBatch.batchNumber, product: this.model.selectedBatch.keySSI};
-            let expirationDate = new Date(this.model.selectedBatch.expiration);
+            let expirationDate = new Date(this.model.selectedBatch.expiryForDisplay);
             const ye = new Intl.DateTimeFormat('en', { year: '2-digit' }).format(expirationDate);
             const mo = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(expirationDate);
             const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(expirationDate);
-            pack.expiration = `${ye}${mo}${da}`;
+            pack.expiryForDisplay = `${ye}${mo}${da}`;
             pack.serialNumber = this.model.package.serialNumber;
 
             this.buildPackageDSU(pack, (err, gtinSSI)=>{
@@ -93,7 +93,7 @@ export default class createPackageController extends ContainerController {
             if(err){
                 return callback(err);
             }
-            gtin_dsu_builder.setGtinSSI(transactionId, constants.DOMAIN_NAME, pack.gtin, pack.batch, pack.expiration,(err)=>{
+            gtin_dsu_builder.setGtinSSI(transactionId, constants.DOMAIN_NAME, pack.gtin, pack.batch, pack.expiryForDisplay,(err)=>{
                 if(err){
                     return callback(err);
                 }
