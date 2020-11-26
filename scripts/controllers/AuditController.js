@@ -6,6 +6,7 @@ export default class AuditController extends ContainerController {
         super(element, history);
 
         this.setModel({});
+        this.logService = new LogService(this.DSUStorage);
 
         this.model.addExpression('logListLoaded', () => {
             return typeof this.model.logs !== "undefined";
@@ -19,7 +20,7 @@ export default class AuditController extends ContainerController {
             this.showModal('viewKeySSIModal', {keySSI: event.data}, () => {});
         });
 
-        LogService.getLogs((err, logs) => {
+        this.logService.getLogs((err, logs) => {
             if (err) {
                 //todo: implement better error handling
                 //throw err;

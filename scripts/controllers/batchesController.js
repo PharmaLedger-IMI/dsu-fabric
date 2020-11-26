@@ -1,5 +1,5 @@
 import ContainerController from "../../cardinal/controllers/base-controllers/ContainerController.js";
-import storage from "../services/Storage.js";
+import StorageService from '../services/StorageService.js';
 import constants from "../constants.js";
 import utils from "../utils.js";
 
@@ -7,7 +7,9 @@ export default class batchesController extends ContainerController {
     constructor(element, history) {
         super(element, history);
         this.setModel({});
-        storage.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) =>{
+        this.storageService = new StorageService(this.DSUStorage);
+
+        this.storageService.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) =>{
             if (typeof batches === "undefined" || batches === null) {
                 batches = [];
             }

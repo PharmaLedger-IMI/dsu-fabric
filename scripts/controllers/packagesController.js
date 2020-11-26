@@ -1,12 +1,14 @@
 import ContainerController from '../../cardinal/controllers/base-controllers/ContainerController.js';
-import storage from '../services/Storage.js';
 import constants from '../constants.js';
+import StorageService from "../services/StorageService.js";
 
 export default class packagesController extends ContainerController {
     constructor(element, history) {
         super(element, history);
         this.setModel({});
-        storage.getItem(constants.PACKAGES_STORAGE_PATH, "json", (err, packs) => {
+        this.storageService = new StorageService(this.DSUStorage);
+
+        this.storageService.getItem(constants.PACKAGES_STORAGE_PATH, "json", (err, packs) => {
             if (err) {
                 console.log(err);
             }
@@ -15,7 +17,7 @@ export default class packagesController extends ContainerController {
                 packs = [];
             }
 
-            packs.forEach((pack)=>{
+            packs.forEach((pack) => {
                 pack.code = this.generateSerializationForPack(pack);
             });
             this.model.packs = packs;

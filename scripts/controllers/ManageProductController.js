@@ -2,7 +2,7 @@ import ContainerController from '../../cardinal/controllers/base-controllers/Con
 import Product from '../models/Product.js';
 import Languages from "../models/Languages.js";
 import constants from '../constants.js';
-import storage from '../services/Storage.js';
+import StorageService from '../services/StorageService.js';
 import DSU_Builder from '../services/DSU_Builder.js';
 import UploadTypes from "../models/UploadTypes.js";
 import LogService from '../services/LogService.js';
@@ -18,6 +18,9 @@ export default class ManageProductController extends ContainerController {
     constructor(element, history) {
         super(element, history);
         this.setModel({});
+        this.storageService = new StorageService(this.DSUStorage);
+        this.logService = new LogService(this.DSUStorage);
+
         let state = this.History.getState();
         this.productIndex = state !== undefined ? state.index : undefined;
         this.model.languages = {
@@ -36,7 +39,7 @@ export default class ManageProductController extends ContainerController {
             this.addLanguageTypeFilesListener(event)
         });
 
-        storage.getItem(constants.PRODUCTS_STORAGE_PATH, "json", (err, products) => {
+        this.storageService.getItem(constants.PRODUCTS_STORAGE_PATH, "json", (err, products) => {
             if (err) {
                 throw err;
             }
@@ -204,7 +207,7 @@ export default class ManageProductController extends ContainerController {
     }
 
     updateProductDSU(transactionId, product, callback) {
-        storage.getItem(constants.PRODUCT_KEYSSI_STORAGE_PATH, "json", (err, keySSIs) => {
+        this.storageService.getItem(constants.PRODUCT_KEYSSI_STORAGE_PATH, "json", (err, keySSIs) => {
             if (err) {
                 return callback(err);
             }
@@ -325,22 +328,22 @@ export default class ManageProductController extends ContainerController {
             prodElement[product.gtin] = [product];
             this.products.push(prodElement);
         }
-        LogService.log({
+        this.logService.log({
             ...product,
             action: "created product",
             logType: 'PRODUCT_LOG'
         });
-        storage.setItem(constants.PRODUCTS_STORAGE_PATH, JSON.stringify(this.products), callback);
+        this.storageService.setItem(constants.PRODUCTS_STORAGE_PATH, JSON.stringify(this.products), callback);
     }
 
     persistKeySSI(keySSI, gtin, callback) {
-        storage.getItem(constants.PRODUCT_KEYSSI_STORAGE_PATH, "json", (err, keySSIs) => {
+        this.storageService.getItem(constants.PRODUCT_KEYSSI_STORAGE_PATH, "json", (err, keySSIs) => {
             if (typeof keySSIs === "undefined" || keySSIs === null) {
                 keySSIs = {};
             }
 
             keySSIs[gtin] = keySSI;
-            storage.setItem(constants.PRODUCT_KEYSSI_STORAGE_PATH, JSON.stringify(keySSIs), callback);
+            this.storageService.setItem(constants.PRODUCT_KEYSSI_STORAGE_PATH, JSON.stringify(keySSIs), callback);
         });
     }
 

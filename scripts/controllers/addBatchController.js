@@ -1,7 +1,7 @@
 import ContainerController from "../../cardinal/controllers/base-controllers/ContainerController.js";
 import constants from "../constants.js";
 import Batch from "../models/Batch.js";
-import storage from "../services/Storage.js";
+import StorageService from '../services/StorageService.js';
 import DSU_Builder from "../services/DSU_Builder.js";
 import utils from "../utils.js";
 import LogService from "../services/LogService.js";
@@ -13,6 +13,9 @@ export default class addBatchController extends ContainerController {
         super(element, history);
         let batch = new Batch();
         this.setModel({});
+        this.storageService = new StorageService(this.DSUStorage);
+        this.logService = new LogService(this.DSUStorage);
+
         this.model.batch = batch;
 
         this.model.products = {
@@ -23,7 +26,7 @@ export default class addBatchController extends ContainerController {
             label: "Version",
             placeholder: "Select a version"
         }
-        storage.getItem(constants.PRODUCTS_STORAGE_PATH, "json", (err, products) => {
+        this.storageService.getItem(constants.PRODUCTS_STORAGE_PATH, "json", (err, products) => {
                 if (err) {
                     return console.log(err);
                 }
@@ -39,7 +42,7 @@ export default class addBatchController extends ContainerController {
         this.on("add-batch", () => {
             let batch = this.model.batch;
             batch.expiry = utils.convertDateToISO(batch.expiry);
-            storage.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
+            this.storageService.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
                 if (typeof batches !== "undefined" && batches !== null) {
                     this.batches = batches;
                     this.batchIndex = batches.findIndex(batch => this.model.batch.batchNumber === batch.batchNumber);
@@ -69,7 +72,7 @@ export default class addBatchController extends ContainerController {
                     }
                     batch.keySSI = keySSI;
 
-                    LogService.log({
+                    this.logService.log({
                         ...batch,
                         action: "created batch",
                         logType: 'BATCH_LOG'
@@ -95,7 +98,7 @@ export default class addBatchController extends ContainerController {
         });
 
         this.model.onChange("batch.batchNumber", (event) => {
-            storage.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
+            this.storageService.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
                 if (typeof batches !== "undefined" && batches !== null) {
                     this.batches = batches;
                     this.batchIndex = batches.findIndex(batch => this.model.batch.batchNumber === Object.keys(batch)[0]);
@@ -104,7 +107,7 @@ export default class addBatchController extends ContainerController {
         })
 
         this.model.onChange("products.value", (event) => {
-            storage.getItem(constants.PRODUCTS_STORAGE_PATH, "json", (err, products) => {
+            this.storageService.getItem(constants.PRODUCTS_STORAGE_PATH, "json", (err, products) => {
                 this.productIndex = products.findIndex(product => Object.keys(product)[0] === this.model.products.value);
                 this.selectedProduct = products[this.productIndex][this.model.products.value];
                 this.model.versions.options = this.selectedProduct.map(prod => {
@@ -181,7 +184,7 @@ export default class addBatchController extends ContainerController {
     }
 
     persistBatch(batch, callback) {
-        storage.getItem(constants.BATCHES_STORAGE_PATH, 'json', (err, batches) => {
+        this.storageService.getItem(constants.BATCHES_STORAGE_PATH, 'json', (err, batches) => {
             if (err) {
                 // if no products file found an error will be captured here
                 //todo: improve error handling here
@@ -192,7 +195,7 @@ export default class addBatchController extends ContainerController {
             }
 
             batches.push(batch);
-            storage.setItem(constants.BATCHES_STORAGE_PATH, JSON.stringify(batches), callback);
+            this.storageService.setItem(constants.BATCHES_STORAGE_PATH, JSON.stringify(batches), callback);
         });
     }
 

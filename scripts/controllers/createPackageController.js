@@ -3,7 +3,7 @@ import Package from '../models/Package.js';
 import GTIN_DSU_Builder from "../services/DSU_Builder.js";
 import Batch from "../models/Batch.js";
 import Countries from "../models/Countries.js";
-import storage from "../services/Storage.js";
+import StorageService from '../services/StorageService.js';
 import constants from "../constants.js";
 
 const gtin_dsu_builder = new GTIN_DSU_Builder();
@@ -13,9 +13,11 @@ export default class createPackageController extends ContainerController {
         super(element);
 
         this.setModel({});
+        this.storageService = new StorageService(this.DSUStorage);
+
         this.model.package = new Package();
 
-        storage.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
+        this.storageService.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
             if(err){
                 return console.log("Error", err);
             }
@@ -38,13 +40,13 @@ export default class createPackageController extends ContainerController {
         });
 
         this.model.onChange("batches.value", (event)=>{
-            storage.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
+            this.storageService.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
                 let batch = batches.find(batch => batch.batchNumber === this.model.batches.value);
                 this.model.expiration = batch.expiration;
                 this.model.country = Countries.getCountry(batch.country);
                 this.model.selectedBatch = batch;
 
-                storage.getItem(constants.PRODUCTS_STORAGE_PATH, "json", (err, products) => {
+                this.storageService.getItem(constants.PRODUCTS_STORAGE_PATH, "json", (err, products) => {
                     if(err){
                         console.log(err);
                     }
@@ -112,7 +114,7 @@ export default class createPackageController extends ContainerController {
     }
 
     persistPack(pack, callback){
-        storage.getItem(constants.PACKAGES_STORAGE_PATH, 'json', (err, packs) => {
+        this.storageService.getItem(constants.PACKAGES_STORAGE_PATH, 'json', (err, packs) => {
             if (err) {
                 //todo: improve error handling here
                return callback(err);
@@ -123,7 +125,7 @@ export default class createPackageController extends ContainerController {
             }
 
             packs.push(pack);
-            storage.setItem(constants.PACKAGES_STORAGE_PATH, JSON.stringify(packs), callback);
+            this.storageService.setItem(constants.PACKAGES_STORAGE_PATH, JSON.stringify(packs), callback);
         });
     }
 

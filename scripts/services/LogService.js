@@ -1,41 +1,43 @@
-import storage from "./Storage.js";
 import constants from '../constants.js';
+import StorageService from "./StorageService.js";
 
-let log = (logDetails) => {
-	if (logDetails === null || logDetails === undefined) {
-		return;
+export default class LogService {
+
+	constructor(dsuStorage) {
+		this.storageService = new StorageService(dsuStorage);
 	}
-	getLogs((err, logs) => {
-		if (err) {
-			return console.log("Error retrieving logs.")
+
+	log (logDetails) {
+		if (logDetails === null || logDetails === undefined) {
+			return;
 		}
-		logs.push({
-			...logDetails,
-			user: "<Username>",
-			timestamp: new Date().getTime()
-		});
-		storage.setItem(constants.LOGS_STORAGE_PATH, JSON.stringify(logs), (err) => {
+		this.getLogs((err, logs) => {
 			if (err) {
-				return console.log("Error adding a log.")
+				return console.log("Error retrieving logs.")
 			}
+			logs.push({
+				...logDetails,
+				user: "<Username>",
+				timestamp: new Date().getTime()
+			});
+			this.storageService.setItem(constants.LOGS_STORAGE_PATH, JSON.stringify(logs), (err) => {
+				if (err) {
+					return console.log("Error adding a log.")
+				}
+			});
+		})
+	}
+
+	getLogs (callback) {
+		this.storageService.getItem(constants.LOGS_STORAGE_PATH, 'json', (err, logs) => {
+			if (err) {
+				return callback(err);
+			}
+
+			if (typeof logs === "undefined" || logs === null) {
+				return callback(undefined, []);
+			}
+			callback(undefined, logs)
 		});
-	})
-}
-
-let getLogs = (callback) => {
-	storage.getItem(constants.LOGS_STORAGE_PATH, 'json', (err, logs) => {
-		if (err) {
-			return callback(err);
-		}
-
-		if (typeof logs === "undefined" || logs === null) {
-			return callback(undefined, []);
-		}
-		callback(undefined, logs)
-	});
-}
-
-export default {
-	log: log,
-	getLogs: getLogs
+	}
 }
