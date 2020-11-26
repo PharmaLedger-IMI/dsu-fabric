@@ -165,6 +165,11 @@ export default class addBatchController extends ContainerController {
             if (err) {
                 return callback(err);
             }
+
+            if(!batch.gtin || !batch.batchNumber || !batch.expiry){
+                alert("A mandatory field is missing");
+                return;
+            }
             dsuBuilder.setGtinSSI(transactionId, constants.DOMAIN_NAME, batch.gtin, batch.batchNumber, batch.expiry, (err) => {
                 if (err) {
                     return callback(err);
