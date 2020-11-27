@@ -19,14 +19,6 @@
           "options": {
             "overwrite": true
           }
-        },
-        {
-          "type": "copy",
-          "src": "../../privatesky/psknode/bundles/edfsBar.js",
-          "target": "./scripts/bundles/edfsBar.js",
-          "options": {
-            "overwrite": true
-          }
         }
       ]
     },
