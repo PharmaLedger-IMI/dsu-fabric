@@ -11,7 +11,6 @@ const dsuBuilder = new DSU_Builder();
 const PRODUCT_STORAGE_FILE = constants.PRODUCT_STORAGE_FILE;
 const PRODUCT_IMAGE_FILE = constants.PRODUCT_IMAGE_FILE;
 const LEAFLET_ATTACHMENT_FILE = constants.LEAFLET_ATTACHMENT_FILE;
-const DOMAIN_NAME = constants.DOMAIN_NAME;
 const SMPC_ATACHMENT_FILE = constants.SMPC_ATACHMENT_FILE;
 
 export default class ManageProductController extends ContainerController {
@@ -191,18 +190,12 @@ export default class ManageProductController extends ContainerController {
     }
 
     createProductDSU(transactionId, product, callback) {
-        dsuBuilder.setDLDomain(transactionId, DOMAIN_NAME, (err) => {
+        this.addProductFilesToDSU(transactionId, product, (err, keySSI) => {
             if (err) {
                 return callback(err);
             }
 
-            this.addProductFilesToDSU(transactionId, product, (err, keySSI) => {
-                if (err) {
-                    return callback(err);
-                }
-
-                this.persistKeySSI(keySSI, product.gtin, err => callback(err, keySSI));
-            });
+            this.persistKeySSI(keySSI, product.gtin, err => callback(err, keySSI));
         });
     }
 

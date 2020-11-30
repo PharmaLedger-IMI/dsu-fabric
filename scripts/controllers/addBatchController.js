@@ -140,24 +140,17 @@ export default class addBatchController extends ContainerController {
             if (err) {
                 return callback(err);
             }
-
-            dsuBuilder.setDLDomain(transactionId, constants.DOMAIN_NAME, (err) => {
+            dsuBuilder.addFileDataToDossier(transactionId, constants.BATCH_STORAGE_FILE, JSON.stringify(batch), (err) => {
                 if (err) {
                     return callback(err);
                 }
 
-                dsuBuilder.addFileDataToDossier(transactionId, constants.BATCH_STORAGE_FILE, JSON.stringify(batch), (err) => {
+                dsuBuilder.mount(transactionId, constants.PRODUCT_DSU_MOUNT_POINT, batch.product, (err) => {
                     if (err) {
                         return callback(err);
                     }
 
-                    dsuBuilder.mount(transactionId, constants.PRODUCT_DSU_MOUNT_POINT, batch.product, (err) => {
-                        if (err) {
-                            return callback(err);
-                        }
-
-                        dsuBuilder.buildDossier(transactionId, callback);
-                    });
+                    dsuBuilder.buildDossier(transactionId, callback);
                 });
             });
         });

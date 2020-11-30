@@ -19,6 +19,14 @@
           "options": {
             "overwrite": true
           }
+        },
+        {
+          "type": "copy",
+          "src": "../../privatesky/psknode/bundles/iframeBoot.js",
+          "target": "./scripts/bundles/iframeBoot.js",
+          "options": {
+            "overwrite": true
+          }
         }
       ]
     },

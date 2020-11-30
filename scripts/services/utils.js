@@ -1,5 +1,6 @@
 
 function getPostHandlerFor(apiname){
+
 	function getBaseURL() {
 		const protocol = window.location.protocol;
 		const host = window.location.hostname;
@@ -9,6 +10,8 @@ function getPostHandlerFor(apiname){
 	}
 
 	function doPost(url, data, options, callback) {
+		console.log("look at me ... ", $$.environmentType);
+		const http = require("opendsu").loadApi("http");
 		if (typeof options === "function") {
 			callback = options;
 			options = {};
@@ -22,7 +25,7 @@ function getPostHandlerFor(apiname){
 
 		const baseURL = getBaseURL();
 		url = `${baseURL}${url}#x-blockchain-domain-request`;
-		fetch(url, {
+		http.fetch(url, {
 			method: 'POST',
 			headers: options.headers,
 			body: data
