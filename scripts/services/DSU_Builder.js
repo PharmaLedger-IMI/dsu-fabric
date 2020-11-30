@@ -16,7 +16,7 @@ export default class DSU_Builder {
                     return callback(err);
                 }
 
-                headers["Authorisation"] = presentationToken;
+                headers["Authorization"] = presentationToken;
                 return callback(undefined, {url, headers});
             });
 
