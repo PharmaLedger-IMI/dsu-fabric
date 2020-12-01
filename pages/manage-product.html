@@ -8,14 +8,16 @@
         <psk-text-input label="Version" value="@product.version" read-only></psk-text-input>
         <psk-form class="language-leaflets-grid">
             <psk-button event-name="add-language-leaflet">
-                <psk-icon icon="plus"></psk-icon>
+                <!--<psk-icon icon="plus"></psk-icon>-->
+                <span style="font-weight: bold">+</span>
             </psk-button>
             <psk-for-each data-view-model="@languageTypeCards">
                 <psk-card class="language-leaflet-card">
                     <div class="language-leaflet-card-header">
                         <psk-label label="@language.label"></psk-label>
                         <psk-button event-data="@" event-name="delete-language-leaflet">
-                            <psk-icon icon="times" color="rgb(255, 255, 255)"></psk-icon>
+                            <!--<psk-icon icon="times" color="rgb(255, 255, 255)"></psk-icon>-->
+                            <span style="font-weight: bold">-</span>
                         </psk-button>
                     </div>
                     <div class="language-leaflet-card-body">

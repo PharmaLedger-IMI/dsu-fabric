@@ -3,7 +3,7 @@ import Utils from "./Utils.js";
 export default class Product {
     name = "";
     gtin = "";
-    photo = "assets/images/default.png";
+    photo = "/download/code/assets/images/default.png";
     description = "";
     leaflet = "";
     manufName = "Novartis Pharmaceuticals Corporation";
