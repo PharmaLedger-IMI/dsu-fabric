@@ -67,8 +67,10 @@ export default class addBatchController extends ContainerController {
                     return;
                 }
 
+                this.showLoadingModal();
                 this.buildBatchDSU(batch, (err, keySSI) => {
                     if (err) {
+                        this.hideLoadingModal();
                         return this.showError(err, "Batch DSU build failed.");
                     }
                     batch.keySSI = keySSI;
@@ -81,15 +83,18 @@ export default class addBatchController extends ContainerController {
 
                     this.persistBatch(batch, (err) => {
                         if (err) {
+                            this.hideLoadingModal();
                             this.showError(err, "Batch keySSI failed to be stored.");
                             return;
                         }
 
                         this.buildImmutableDSU(batch, (err, gtinSSI) => {
                             if (err) {
+                                this.hideLoadingModal();
                                 return this.showError(err, "Failed to build immutable DSU")
                             }
 
+                            this.hideLoadingModal();
                             console.log("Immutable DSU GtinSSI:", gtinSSI);
                             this.History.navigateToPageByTag("batches");
                         });
@@ -210,5 +215,16 @@ export default class addBatchController extends ContainerController {
             errMessage = err;
         }
         this.feedbackEmitter(errMessage, title, type);
+    }
+
+    showLoadingModal() {
+        this.showModal('loadingModal', {
+            title: 'Loading...',
+            description: 'We are creating your batch right now ...'
+        });
+    }
+
+    hideLoadingModal() {
+        this.element.dispatchEvent(new Event('closeModal'));
     }
 };

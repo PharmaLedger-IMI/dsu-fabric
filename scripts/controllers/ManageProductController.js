@@ -73,17 +73,22 @@ export default class ManageProductController extends ContainerController {
 
             this.incrementVersionForExistingProduct();
 
+            this.showLoadingModal();
             this.buildProductDSU(product, (err, keySSI) => {
                 if (err) {
+                    this.hideLoadingModal();
                     return this.showError(err, "Product DSU build failed.");
                 }
                 product.keySSI = keySSI;
+
                 console.log("Product DSU KeySSI:", keySSI);
                 this.persistProduct(product, (err) => {
                     if (err) {
+                        this.hideLoadingModal();
                         this.showError(err, "Product keySSI failed to be stored.");
                         return;
                     }
+                    this.hideLoadingModal();
                     this.History.navigateToPageByTag("products");
                 });
             });
@@ -353,5 +358,16 @@ export default class ManageProductController extends ContainerController {
             errMessage = err;
         }
         this.feedbackEmitter(errMessage, title, type);
+    }
+
+    showLoadingModal() {
+        this.showModal('loadingModal', {
+            title: 'Loading...',
+            description: 'We are creating your product right now ...'
+        });
+    }
+
+    hideLoadingModal() {
+        this.element.dispatchEvent(new Event('closeModal'));
     }
 }

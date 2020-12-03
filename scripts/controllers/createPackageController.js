@@ -71,8 +71,10 @@ export default class createPackageController extends ContainerController {
             pack.expiryForDisplay = `${ye}${mo}${da}`;
             pack.serialNumber = this.model.package.serialNumber;
 
+            this.showLoadingModal();
             this.buildPackageDSU(pack, (err, gtinSSI)=>{
                 if (err) {
+                    this.hideLoadingModal();
                     this.showError(err, "PackageDSU build failed.");
                     return;
                 }
@@ -80,8 +82,11 @@ export default class createPackageController extends ContainerController {
                 pack.keySSI = gtinSSI;
                 this.persistPack(pack, (err) => {
                     if(err){
+                        this.hideLoadingModal();
                         this.showError(err, "Persist Package failed.");
                     }
+
+                    this.hideLoadingModal();
                     this.History.navigateToPageByTag("packages");
                 });
             });
@@ -142,5 +147,16 @@ export default class createPackageController extends ContainerController {
             errMessage = err;
         }
         this.feedbackEmitter(errMessage, title, type);
+    }
+
+    showLoadingModal() {
+        this.showModal('loadingModal', {
+            title: 'Loading...',
+            description: 'We are creating your package right now ...'
+        });
+    }
+
+    hideLoadingModal() {
+        this.element.dispatchEvent(new Event('closeModal'));
     }
 }
