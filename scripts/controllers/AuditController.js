@@ -17,7 +17,7 @@ export default class AuditController extends ContainerController {
         }, 'logs');
 
         this.on("show-keySSI", (event) => {
-            this.showModal('viewKeySSIModal', {logEntry: event.data}, () => {});
+            this.showModal('viewKeySSIModal', {logData: event.data}, () => {});
         });
 
         this.logService.getLogs((err, logs) => {
@@ -27,10 +27,11 @@ export default class AuditController extends ContainerController {
                     action:item.action,
                     username:item.username,
                     creationTime:item.creationTime,
-                    keySSI:item.keySSI,
-                    allInfo:item
-                };
-                le.logEntry = le;
+                    allInfo: {
+                        keySSI:item.keySSI,
+                        all:JSON.stringify(item),
+                        }
+                    };
                 return le;
             };
 
@@ -40,9 +41,11 @@ export default class AuditController extends ContainerController {
                     username:item.username,
                     creationTime:item.logInfo.creationTime,
                     keySSI:item.logInfo.keySSI,
-                    allInfo:item
+                    allInfo: {
+                        keySSI:item.keySSI,
+                        all:JSON.stringify(item),
+                    }
                 };
-                le.logEntry = le;
                 return le;
             };
 
@@ -52,9 +55,11 @@ export default class AuditController extends ContainerController {
                     username:item.username,
                     creationTime:item.logInfo.creationTime,
                     keySSI:item.logInfo.keySSI,
-                    allInfo:item
+                    allInfo: {
+                        keySSI:item.keySSI,
+                        all:JSON.stringify(item),
+                    }
                 };
-                le.logEntry = le;
                 return le;
             };
 
