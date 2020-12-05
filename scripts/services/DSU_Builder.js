@@ -23,8 +23,9 @@ export default class DSU_Builder {
         });
     }
 
-    getTransactionId(callback) {
 
+
+    ensureHolderInfo(callback) {
         function getJSON(pth, callback){
             fetch(pth).then((response) => {
                 return response.json();
@@ -32,6 +33,28 @@ export default class DSU_Builder {
                 return callback(undefined, json)
             }).catch(callback);
         }
+
+        if (typeof this.holderInfo === "undefined" || typeof this.credential === "undefined") {
+            getJSON("/download/myKeys/holder.json", (err, holderInfo) => {
+                if (err) {
+                    return callback(Error("No holder info available!"));
+                }
+                this.holderInfo = holderInfo;
+
+                getJSON("/download/myKeys/credential.json", (err, result) => {
+                    if (err) {
+                        return callback(Error("No credentials available!"));
+                    }
+                    this.credential = result.credential;
+                    return callback(undefined, holderInfo);
+                });
+            });
+        } else {
+            callback(undefined, this.holderInfo);
+        }
+    }
+
+    getTransactionId(callback) {
 
         let obtainTransaction = ()=>{
             doPost(`/${this.holderInfo.domain}/begin`, (err, transactionId) => {
@@ -48,27 +71,12 @@ export default class DSU_Builder {
             });
         }
 
-        if (typeof this.holderInfo === "undefined" || typeof this.credential === "undefined") {
-            getJSON("/download/myKeys/holder.json", (err, holderInfo) => {
-                if(err){
-                    return callback("No holder info available!");
-                }
-                this.holderInfo = holderInfo;
-
-                getJSON("/download/myKeys/credential.json", (err, result)=>{
-                    if(err){
-                        return callback("No credentials available!");
-                    }
-                    this.credential = result.credential;
-
-                    obtainTransaction();
-                });
-            });
-
-            return;
-        }
-
-        obtainTransaction();
+        this.ensureHolderInfo( (err)=>{
+            if(err){
+                return callback(createOpenDSUErrorWrapper("Holder missconfiguration in the wallet", err));
+            }
+            obtainTransaction();
+        });
     }
 
     setKeySSI(transactionId, keyssi, callback) {

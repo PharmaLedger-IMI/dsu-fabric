@@ -3,26 +3,22 @@
         <psk-condition condition="@logListLoaded">
             <div slot="condition-true">
                 <psk-condition condition="@listHeader">
-                    <psk-layout slot="condition-true" class="audit-header" template-columns="1fr 1fr 1fr 1fr 1fr 1fr 1fr">
-                        <psk-label label="Type"></psk-label>
-                        <psk-label label="User"></psk-label>
+                    <psk-layout slot="condition-true" class="audit-header" template-columns="1fr 1fr 1fr 1fr ">
+
                         <psk-label label="Action"></psk-label>
-                        <psk-label label="GTIN"></psk-label>
-                        <psk-label label="Version"></psk-label>
-                        <psk-label label="Timestamp"></psk-label>
+                        <psk-label label="User"></psk-label>
+
+                        <psk-label label="Creation Time"></psk-label>
                         <psk-label label="KeySSI"></psk-label>
                     </psk-layout>
                 </psk-condition>
                 <hr>
                 <psk-for-each data-view-model="logs">
-                    <psk-layout class="audit-line" template-columns="1fr 1fr 1fr 1fr 1fr 1fr 1fr">
-                        <psk-label label="@logType"></psk-label>
-                        <psk-label label="@user"></psk-label>
+                    <psk-layout class="audit-line" template-columns="1fr 1fr 1fr 1fr ">
                         <psk-label label="@action"></psk-label>
-                        <psk-label label="@gtin"></psk-label>
-                        <psk-label label="@version"></psk-label>
-                        <psk-label label="@timestamp"></psk-label>
-                        <psk-button class="audit-keyssi-button" event-data="@keySSI" event-name="show-keySSI">
+                        <psk-label label="@username"></psk-label>
+                        <psk-label label="@creationTime"></psk-label>
+                        <psk-button class="audit-keyssi-button" event-data="@logEntry" event-name="show-keySSI">
                             <psk-icon icon="eye"></psk-icon>
                             View
                         </psk-button>

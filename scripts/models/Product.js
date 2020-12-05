@@ -6,7 +6,7 @@ export default class Product {
     photo = "/download/code/assets/images/default.png";
     description = "";
     leaflet = "";
-    manufName = "Novartis Pharmaceuticals Corporation";
+    manufName = " ";
     version = 1;
     files = [];
 

@@ -1,8 +1,9 @@
 <psk-container controller-name="ViewKeySSIController">
     <psk-modal opened>
-        <psk-label slot="title" class="title" label="KeySSI"></psk-label>
+        <psk-label slot="title" class="title" label="Log Details"></psk-label>
         <div class='content'>
-            <psk-label class="key-ssi-label" label="@keySSI"></psk-label>
+            <psk-label class="key-ssi-label" label="@logEntry.keySSI"></psk-label>
+            <psk-label class="key-ssi-label" label="@logEntry"></psk-label>
         </div>
         <div class="modal-action-menu" slot="footer">
             <psk-button label="Close" event-name="close-button-on-click"></psk-button>

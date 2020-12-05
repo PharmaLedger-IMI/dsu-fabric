@@ -10,7 +10,6 @@ function getPostHandlerFor(apiname){
 	}
 
 	function doPost(url, data, options, callback) {
-		console.log("look at me ... ", $$.environmentType);
 		const http = require("opendsu").loadApi("http");
 		if (typeof options === "function") {
 			callback = options;

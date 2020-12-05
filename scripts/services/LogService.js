@@ -17,7 +17,6 @@ export default class LogService {
 			}
 			logs.push({
 				...logDetails,
-				user: "<Username>",
 				timestamp: new Date().getTime()
 			});
 			this.storageService.setItem(constants.LOGS_STORAGE_PATH, JSON.stringify(logs), (err) => {

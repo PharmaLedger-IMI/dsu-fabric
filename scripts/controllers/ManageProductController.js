@@ -5,7 +5,9 @@ import constants from '../constants.js';
 import StorageService from '../services/StorageService.js';
 import DSU_Builder from '../services/DSU_Builder.js';
 import UploadTypes from "../models/UploadTypes.js";
+import utils from "../utils.js";
 import LogService from '../services/LogService.js';
+
 
 const dsuBuilder = new DSU_Builder();
 const PRODUCT_STORAGE_FILE = constants.PRODUCT_STORAGE_FILE;
@@ -50,6 +52,17 @@ export default class ManageProductController extends ContainerController {
             } else {
                 this.model.product = new Product();
             }
+
+            dsuBuilder.ensureHolderInfo( (err, holderInfo) => {
+                if(!err && holderInfo){
+                    console.log(holderInfo)
+                    this.model.product.manufName = holderInfo.userDetails.company;
+                    this.model.username  = holderInfo.userDetails.username;
+                } else {
+                    this.showError("Invalid configuration detected! Configure your wallet properly in the Holder section!")
+                   // this.History.navigateToPageByTag("error");
+                }
+            })
         });
 
         this.on("product-photo-selected", (event) => {
@@ -326,9 +339,13 @@ export default class ManageProductController extends ContainerController {
             prodElement[product.gtin] = [product];
             this.products.push(prodElement);
         }
+
+        product.creationTime = utils.convertDateToISO(Date.now());
+
         this.logService.log({
-            ...product,
-            action: "created product",
+            logInfo:product,
+            username: this.model.username,
+            action: "Created product",
             logType: 'PRODUCT_LOG'
         });
         this.storageService.setItem(constants.PRODUCTS_STORAGE_PATH, JSON.stringify(this.products), callback);
@@ -343,21 +360,6 @@ export default class ManageProductController extends ContainerController {
             keySSIs[gtin] = keySSI;
             this.storageService.setItem(constants.PRODUCT_KEYSSI_STORAGE_PATH, JSON.stringify(keySSIs), callback);
         });
-    }
-
-    showError(err, title, type) {
-        let errMessage;
-        title = title ? title : 'Validation Error';
-        type = type ? type : 'alert-danger';
-
-        if (err instanceof Error) {
-            errMessage = err.message;
-        } else if (typeof err === 'object') {
-            errMessage = err.toString();
-        } else {
-            errMessage = err;
-        }
-        this.feedbackEmitter(errMessage, title, type);
     }
 
     showLoadingModal() {

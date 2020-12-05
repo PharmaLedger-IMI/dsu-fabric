@@ -21,15 +21,12 @@ export default class Batch {
     }
 
     validate() {
-        const errors = [];
         if (!this.batchNumber) {
-            errors.push('Lot number is required.');
+            return 'Batch number is mandatory field';
         }
-
         if (!this.expiryForDisplay) {
-            errors.push('Expiration date is required.');
+            return  'Expiration date is a mandatory field.';
         }
-
-        return errors.length === 0 ? true : errors;
+        return undefined;
     }
 }

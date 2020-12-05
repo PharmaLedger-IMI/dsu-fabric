@@ -17,18 +17,62 @@ export default class AuditController extends ContainerController {
         }, 'logs');
 
         this.on("show-keySSI", (event) => {
-            this.showModal('viewKeySSIModal', {keySSI: event.data}, () => {});
+            this.showModal('viewKeySSIModal', {logEntry: event.data}, () => {});
         });
 
         this.logService.getLogs((err, logs) => {
-            if (err) {
-                //todo: implement better error handling
-                //throw err;
-            }
+
+            function unknownLog(item){
+                let le = {
+                    action:item.action,
+                    username:item.username,
+                    creationTime:item.creationTime,
+                    keySSI:item.keySSI,
+                    allInfo:item
+                };
+                le.logEntry = le;
+                return le;
+            };
+
+            function productLog(item){
+                let le = {
+                    action:`${item.action} ${item.logInfo.name} [${item.logInfo.gtin}] `,
+                    username:item.username,
+                    creationTime:item.logInfo.creationTime,
+                    keySSI:item.logInfo.keySSI,
+                    allInfo:item
+                };
+                le.logEntry = le;
+                return le;
+            };
+
+            function batchLog(item){
+                let le = {
+                    action:`${item.action} ${item.logInfo.batchNumber} [${item.logInfo.gtin}] version ${item.logInfo.version}`,
+                    username:item.username,
+                    creationTime:item.logInfo.creationTime,
+                    keySSI:item.logInfo.keySSI,
+                    allInfo:item
+                };
+                le.logEntry = le;
+                return le;
+            };
+
             if (typeof logs === "undefined" || logs === null) {
                 logs = [];
             }
-            this.model.logs = logs;
+            this.model.logs = logs.map( item => {
+                console.log("Log item", item);
+                try{
+                    switch(item.logType){
+                        case "PRODUCT_LOG": return productLog(item); break;
+                        case "BATCH_LOG": return batchLog(item); break;
+                        default: return unknownLog(item);
+                    }
+                } catch(err){
+                    return unknownLog(item);
+                }
+            });
         })
     }
 }
