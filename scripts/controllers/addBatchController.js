@@ -53,60 +53,43 @@ export default class addBatchController extends ContainerController {
             batch.expiry = utils.convertDateFromISOToGS1Format(batch.expiry);
             this.storageService.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
                 if(err){
-                    this.showError("Failed to retrieve products list");
+                    return this.showErrorModal("Failed to retrieve products list");
                 }
-                /*
-                if (typeof batches !== "undefined" && batches !== null) {
-                    this.batches = batches;
-                    this.batchIndex = batches.findIndex(batch => this.model.batch.batchNumber === batch.batchNumber);
-                }
-
-                if (this.batchIndex >= 0) {
-                    return this.showError("The provided batch number is already associated with a product. Please insert another one");
-                } */
 
                 this.model.batch.serialNumbers = this.model.batch.serialNumbers.split(/[\r\n ,]+/);
                 if (this.model.batch.serialNumbers.length === 0 || this.model.batch.serialNumbers[0] === '') {
-                    return this.showError("Invalid serial numbers");
+                    return this.showErrorModal("Invalid serial numbers");
                 }
                 this.model.batch.serialNumber = this.model.batch.serialNumbers[0];
 
                 let error = batch.validate();
                 if(err){
-                    return this.showError(err);
+                    return this.showErrorModal("Invalid batch info" + err.message);
                 }
-
-
 
                 this.showLoadingModal();
                 this.buildBatchDSU(batch, (err, keySSI) => {
-                    if (err) {
-                        this.hideLoadingModal();
-                        return this.showError(err, "Batch DSU build failed.");
+                    if (err){
+                        return this.showErrorModal("Batch DSU build failed.");
                     }
                     batch.keySSI = keySSI;
-
                     batch.creationTime = utils.convertDateToISO(Date.now());
-                    this.logService.log({
-                        logInfo:batch,
-                        username: this.model.username,
-                        action: "Created Batch ",
-                        logType: 'BATCH_LOG'
-                    });
+
 
                     this.buildImmutableDSU(batch, (err, gtinSSI) => {
                         if (err) {
-                            this.hideLoadingModal();
-                            return this.showError(err, "Failed to build immutable DSU")
+                            return this.showErrorModal("Failed to build immutable DSU");
                         }
-                        console.log("Immutable DSU GtinSSI:", gtinSSI);
-
                         this.persistBatchInWallet(batch, (err) => {
                             if (err) {
-                                this.hideLoadingModal();
-                                this.showError(err, "Batch keySSI failed to be stored.");
-                                return;
+                                return this.showErrorModal("Batch keySSI failed to be stored.");
                             }
+                            this.logService.log({
+                                logInfo:batch,
+                                username: this.model.username,
+                                action: "Created Batch ",
+                                logType: 'BATCH_LOG'
+                            });
                             this.History.navigateToPageByTag("batches");
                         });
                     });
@@ -225,6 +208,18 @@ export default class addBatchController extends ContainerController {
             title: 'Loading...',
             description: 'We are creating your batch right now ...'
         });
+    }
+
+    showErrorModal(errorText) {
+        this.element.dispatchEvent(new Event('closeModal'));
+        this.showModal('loadingModal', {
+            title: 'Error',
+            description: errorText
+        });
+        setTimeout(()=>{
+            this.element.dispatchEvent(new Event('closeModal'));
+            this.History.navigateToPageByTag("batches");
+        },3000)
     }
 
     hideLoadingModal() {
