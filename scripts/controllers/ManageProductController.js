@@ -59,7 +59,7 @@ export default class ManageProductController extends ContainerController {
                     this.model.product.manufName = holderInfo.userDetails.company;
                     this.model.username  = holderInfo.userDetails.username;
                 } else {
-                    this.showError("Invalid configuration detected! Configure your wallet properly in the Holder section!")
+                    this.showErrorModalAndRedirect("Invalid configuration detected! Configure your wallet properly in the Holder section!", "products");
                    // this.History.navigateToPageByTag("error");
                 }
             })
@@ -86,22 +86,21 @@ export default class ManageProductController extends ContainerController {
 
             this.incrementVersionForExistingProduct();
 
-            this.showLoadingModal();
+            this.displayModal("Creating product....");
             this.buildProductDSU(product, (err, keySSI) => {
                 if (err) {
-                    this.hideLoadingModal();
-                    return this.showError(err, "Product DSU build failed.");
+                    this.closeModal();
+                    return this.showErrorModalAndRedirect("Product DSU build failed.", "products");
                 }
                 product.keySSI = keySSI;
 
                 console.log("Product DSU KeySSI:", keySSI);
                 this.persistProduct(product, (err) => {
                     if (err) {
-                        this.hideLoadingModal();
-                        this.showError(err, "Product keySSI failed to be stored.");
-                        return;
+                        this.closeModal();
+                        return this.showErrorModalAndRedirect("Product keySSI failed to be stored in your wallet.", "products");
                     }
-                    this.hideLoadingModal();
+                    this.closeModal();
                     this.History.navigateToPageByTag("products");
                 });
             });
@@ -362,14 +361,4 @@ export default class ManageProductController extends ContainerController {
         });
     }
 
-    showLoadingModal() {
-        this.showModal('loadingModal', {
-            title: 'Loading...',
-            description: 'We are creating your product right now ...'
-        });
-    }
-
-    hideLoadingModal() {
-        this.element.dispatchEvent(new Event('closeModal'));
-    }
 }
