@@ -75,7 +75,6 @@ export default class addBatchController extends ContainerController {
                     batch.keySSI = keySSI;
                     batch.creationTime = utils.convertDateToISO(Date.now());
 
-
                     this.buildImmutableDSU(batch, (err, gtinSSI) => {
                         if (err) {
                             return this.showErrorModalAndRedirect("Failed to build immutable DSU", "batches");

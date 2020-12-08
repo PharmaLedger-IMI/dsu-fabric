@@ -85,7 +85,17 @@ export default class DSU_Builder {
     }
 
     setGtinSSI(transactionId, dlDomain, gtin, batch, expiration, callback) {
-        const body = {dlDomain, gtin, batch, expiration}
+        if (typeof expiration === "function") {
+            callback = expiration;
+            expiration = undefined;
+        }
+
+        if (typeof batch === "function") {
+            callback = batch;
+            batch = undefined;
+        }
+
+        const body = {dlDomain, gtin, batch, expiration};
         const url = `/${this.holderInfo.domain}/gtin/${transactionId}`;
         doPost(url, JSON.stringify(body), callback);
     }

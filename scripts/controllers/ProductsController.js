@@ -40,6 +40,7 @@ export default class ProductsController extends ContainerController {
 			let target = event.target;
 			let targetProduct = target.getAttribute("gtin");
 			const index = parseInt(targetProduct.replace(/\D/g, ''));
+			const gtin = parseInt(targetProduct.replace(/\D/g, ''));
 			this.History.navigateToPageByTag("manage-product", {index: index});
 		}, {capture: true});
 

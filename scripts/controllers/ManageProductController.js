@@ -13,7 +13,7 @@ const dsuBuilder = new DSU_Builder();
 const PRODUCT_STORAGE_FILE = constants.PRODUCT_STORAGE_FILE;
 const PRODUCT_IMAGE_FILE = constants.PRODUCT_IMAGE_FILE;
 const LEAFLET_ATTACHMENT_FILE = constants.LEAFLET_ATTACHMENT_FILE;
-const SMPC_ATACHMENT_FILE = constants.SMPC_ATACHMENT_FILE;
+const SMPC_ATTACHMENT_FILE = constants.SMPC_ATTACHMENT_FILE;
 
 export default class ManageProductController extends ContainerController {
     constructor(element, history) {
@@ -41,26 +41,22 @@ export default class ManageProductController extends ContainerController {
         });
 
         this.storageService.getItem(constants.PRODUCTS_STORAGE_PATH, "json", (err, products) => {
-            if (err) {
-                throw err;
-            }
             this.products = products;
             if (typeof this.productIndex !== "undefined") {
-                const productVersions = Object.values(this.products[this.productIndex])[0];
-                this.model.product = new Product(productVersions[productVersions.length - 1]);
+                this.model.product = new Product(this.getLastVersionProduct());
                 this.model.product.version++;
             } else {
                 this.model.product = new Product();
             }
 
-            dsuBuilder.ensureHolderInfo( (err, holderInfo) => {
-                if(!err && holderInfo){
+            dsuBuilder.ensureHolderInfo((err, holderInfo) => {
+                if (!err && holderInfo) {
                     console.log(holderInfo)
                     this.model.product.manufName = holderInfo.userDetails.company;
-                    this.model.username  = holderInfo.userDetails.username;
+                    this.model.username = holderInfo.userDetails.username;
                 } else {
                     this.showErrorModalAndRedirect("Invalid configuration detected! Configure your wallet properly in the Holder section!", "products");
-                   // this.History.navigateToPageByTag("error");
+                    // this.History.navigateToPageByTag("error");
                 }
             })
         });
@@ -84,7 +80,9 @@ export default class ManageProductController extends ContainerController {
                 return;
             }
 
-            this.incrementVersionForExistingProduct();
+            if(this.sameProductVersionExists()){
+                return this.showErrorModalAndRedirect("A product with the same GTIN already exists.", "products");
+            }
 
             this.displayModal("Creating product....");
             this.buildProductDSU(product, (err, keySSI) => {
@@ -105,6 +103,11 @@ export default class ManageProductController extends ContainerController {
                 });
             });
         });
+    }
+
+    getLastVersionProduct(){
+        const productVersions = Object.values(this.products[this.productIndex])[0];
+        return productVersions[productVersions.length - 1];
     }
 
     addLanguageTypeFilesListener(event) {
@@ -178,31 +181,56 @@ export default class ManageProductController extends ContainerController {
         return true;
     }
 
-    incrementVersionForExistingProduct() {
-        if (typeof this.productIndex === "undefined" && typeof this.products !== "undefined" && this.products !== null) {
+    sameProductVersionExists() {
+        if (typeof this.products === "undefined" || this.products === null || this.products.length === 0) {
+            return false;
+        }
+        if (typeof this.productIndex === "undefined" ) {
             const products = this.products.map(product => {
                 return Object.keys(product)[0];
             });
+
             this.productIndex = products.findIndex(gtin => gtin === this.model.product.gtin);
-            if (this.productIndex >= 0) {
-                const prodVersionsArr = this.products[this.productIndex][this.model.product.gtin];
-                this.model.product = new Product(prodVersionsArr[prodVersionsArr.length - 1]);
-                this.model.product.version++;
-            }
         }
+        if (this.productIndex >= 0 && this.getLastVersionProduct().version === this.model.product.version) {
+            return true;
+        }
+
+        return false;
     }
 
-    buildProductDSU(product, callback) {
+    buildConstProductDSU(gtin, callback) {
         dsuBuilder.getTransactionId((err, transactionId) => {
             if (err) {
                 return callback(err);
             }
 
-            if (product.version > 1) {
-                this.updateProductDSU(transactionId, product, callback);
-            } else {
-                this.createProductDSU(transactionId, product, callback);
+            dsuBuilder.setGtinSSI(transactionId, dsuBuilder.holderInfo.domain, gtin, (err) => {
+                if (err) {
+                    return callback(err);
+                }
+                //TODO: derive a sReadSSI here...
+                dsuBuilder.buildDossier(transactionId, callback);
+            });
+        });
+    }
+
+    buildProductDSU(product, callback) {
+        this.buildConstProductDSU(product.gtin, (err, gtinSSI) => {
+            if (err) {
+                return this.showErrorModalAndRedirect("A product with the same GTIN was already created", "products", 3000);
             }
+            dsuBuilder.getTransactionId((err, transactionId) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (product.version > 1) {
+                    this.updateProductDSU(transactionId, product, callback);
+                } else {
+                    this.createProductDSU(transactionId, product, callback);
+                }
+            });
         });
     }
 
@@ -296,7 +324,7 @@ export default class ManageProductController extends ContainerController {
         let responses = [];
         const uploadTypeConfig = {
             "leaflet": LEAFLET_ATTACHMENT_FILE,
-            "smpc": SMPC_ATACHMENT_FILE
+            "smpc": SMPC_ATTACHMENT_FILE
         }
 
         this.uploadFile(transactionId, basePath + uploadTypeConfig[attachmentType], xmlFiles[0], (err, data) => {
@@ -342,7 +370,7 @@ export default class ManageProductController extends ContainerController {
         product.creationTime = utils.convertDateToISO(Date.now());
 
         this.logService.log({
-            logInfo:product,
+            logInfo: product,
             username: this.model.username,
             action: "Created product",
             logType: 'PRODUCT_LOG'
