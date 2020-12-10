@@ -16,6 +16,9 @@ export default class batchesController extends ContainerController {
 
             batches.forEach((batch)=>{
                 batch.code = this.generateSerializationForBatch(batch);
+                let wrongBatch = JSON.parse(JSON.stringify(batch));
+                wrongBatch.defaultSerialNumber = "WRONG";
+                batch.wrongCode = this.generateSerializationForBatch(wrongBatch);
             });
             this.model.batches = batches;
         });
@@ -26,6 +29,6 @@ export default class batchesController extends ContainerController {
     }
 
     generateSerializationForBatch(batch) {
-        return `(01)${batch.gtin}(21)${batch.serialNumbers[0]}(10)${batch.batchNumber}(17)${batch.expiry}`;
+        return `(01)${batch.gtin}(21)${batch.defaultSerialNumber}(10)${batch.batchNumber}(17)${batch.expiry}`;
     }
 }
