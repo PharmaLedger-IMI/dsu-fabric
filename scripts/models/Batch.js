@@ -34,9 +34,9 @@ export default class Batch {
 
     addSerialNumbers(arr){
         let crypto = require("opendsu").loadAPI("crypto");
-        let bf = crypto.createBloomFilter(undefined, { estimatedElementCount: arr.length, falsePositiveTolerance: 0.000001 });
-        arr.forEach( e=> {
-            bf.insert(bf);
+        let bf = crypto.createBloomFilter({ estimatedElementCount: arr.length, falsePositiveTolerance: 0.000001 });
+        arr.forEach( sn => {
+            bf.insert(sn);
         });
         this.bloomFilterSerialisation = bf.bloomFilterSerialisation();
     }

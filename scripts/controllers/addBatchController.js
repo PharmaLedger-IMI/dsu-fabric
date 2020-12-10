@@ -76,7 +76,7 @@ export default class addBatchController extends ContainerController {
                     return this.showErrorModalAndRedirect("Invalid batch info" + err.message, "batches");
                 }
 
-                this.showModal("Creating product...");
+                this.displayModal("Creating new batch...");
                 this.buildBatchDSU(batch, (err, keySSI) => {
                     if (err){
                         return this.showErrorModalAndRedirect("Batch DSU build failed.", "batches");
