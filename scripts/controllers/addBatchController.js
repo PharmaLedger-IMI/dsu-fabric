@@ -62,6 +62,7 @@ export default class addBatchController extends ContainerController {
                             return this.showError("Invalid list of serial numbers");
                         }
                         this.model.batch.defaultSerialNumber = this.model.batch.serialNumbersArray[0];
+                        console.log("defaultSerialNumber:",this.model.batch.defaultSerialNumber);
                         batch.addSerialNumbers(batch.serialNumbersArray);
                     } else {
                         return this.showError(err, "Invalid list of serial numbers");
