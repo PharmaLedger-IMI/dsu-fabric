@@ -55,12 +55,17 @@ export default class addBatchController extends ContainerController {
                     return this.showErrorModalAndRedirect("Failed to retrieve products list", "batches");
                 } */
                 try{
-                    this.model.batch.serialNumbers = this.model.batch.serialNumbers.split(/[\r\n ,]+/);
-                    if (this.model.batch.serialNumbers.length === 0 || this.model.batch.serialNumbers[0] === '') {
-                        return this.showError("Invalid list of serial numbers");
+                    console.log(this.model.batch.serialNumbers);
+                    if(this.model.batch.serialNumbers != ""){
+                        this.model.batch.serialNumbersArray = this.model.batch.serialNumbers.split(/[\r\n ,]+/);
+                        if (this.model.batch.serialNumbersArray.length === 0 || this.model.batch.serialNumbersArray[0] === '') {
+                            return this.showError("Invalid list of serial numbers");
+                        }
+                        this.model.batch.defaultSerialNumber = this.model.batch.serialNumbersArray[0];
+                        batch.addSerialNumbers(batch.serialNumbersArray);
+                    } else {
+                        return this.showError(err, "Invalid list of serial numbers");
                     }
-                    this.model.batch.defaultSerialNumber = this.model.batch.serialNumbers[0];
-                    batch.addSerialNumbers(batch.serialNumbers);
                 } catch(err){
                     return this.showError(err, "Invalid list of serial numbers");
                 }

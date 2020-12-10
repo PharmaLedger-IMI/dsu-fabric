@@ -3,9 +3,9 @@ export default class Batch {
     batchNumber;
     expiryForDisplay;
     version = 1;
-    bloomFilterSerialisation = null;
     serialNumbers = "430239925150";
     defaultSerialNumber = "0";
+    bloomFilterSerialisation;
 
     constructor(batch) {
         if (typeof batch !== undefined) {
@@ -38,6 +38,6 @@ export default class Batch {
         arr.forEach( e=> {
             bf.insert(bf);
         });
-        bloomFilterSerialisation = bf.bloomFilterSerialisation();
+        this.bloomFilterSerialisation = bf.bloomFilterSerialisation();
     }
 }
