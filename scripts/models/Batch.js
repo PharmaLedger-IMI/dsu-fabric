@@ -3,7 +3,9 @@ export default class Batch {
     batchNumber;
     expiryForDisplay;
     version = 1;
+    bloomFilterSerialisation = null;
     serialNumbers = "430239925150";
+    defaultSerialNumber = "0";
 
     constructor(batch) {
         if (typeof batch !== undefined) {
@@ -28,5 +30,14 @@ export default class Batch {
             return  'Expiration date is a mandatory field.';
         }
         return undefined;
+    }
+
+    addSerialNumbers(arr){
+        let crypto = require("opendsu").loadAPI("crypto");
+        let bf = crypto.createBloomFilter({ estimatedElementCount: arr.length});
+        arr.forEach( e=> {
+            bf.insert(bf);
+        });
+        bloomFilterSerialisation = bf.bloomFilterSerialisation();
     }
 }

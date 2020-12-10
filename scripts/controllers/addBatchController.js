@@ -51,16 +51,19 @@ export default class addBatchController extends ContainerController {
             batch.expiry = utils.convertDateToISO(batch.expiryForDisplay);
             batch.expiry = utils.convertDateFromISOToGS1Format(batch.expiry);
             this.storageService.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
-
                 /*if(err){
                     return this.showErrorModalAndRedirect("Failed to retrieve products list", "batches");
                 } */
-
-                this.model.batch.serialNumbers = this.model.batch.serialNumbers.split(/[\r\n ,]+/);
-                if (this.model.batch.serialNumbers.length === 0 || this.model.batch.serialNumbers[0] === '') {
-                    return this.showErrorModalAndRedirect("Invalid serial numbers", "batches");
+                try{
+                    this.model.batch.serialNumbers = this.model.batch.serialNumbers.split(/[\r\n ,]+/);
+                    if (this.model.batch.serialNumbers.length === 0 || this.model.batch.serialNumbers[0] === '') {
+                        return this.showError("Invalid list of serial numbers");
+                    }
+                    this.model.batch.defaultSerialNumber = this.model.batch.serialNumbers[0];
+                    batch.addSerialNumbers(batch.serialNumbers);
+                } catch(err){
+                    return this.showError(err, "Invalid list of serial numbers");
                 }
-                this.model.batch.serialNumber = this.model.batch.serialNumbers[0];
 
                 let error = batch.validate();
                 if(err){
@@ -81,7 +84,7 @@ export default class addBatchController extends ContainerController {
                         }
                         this.persistBatchInWallet(batch, (err) => {
                             if (err) {
-                                return this.showErrorModalAndRedirect("Batch keySSI failed to be stored.");
+                                return this.showErrorModalAndRedirect("Failing to store Batch keySSI!");
                             }
                             this.logService.log({
                                 logInfo:batch,
@@ -142,7 +145,7 @@ export default class addBatchController extends ContainerController {
             let cleanBatch = JSON.parse(JSON.stringify(batch));
 
             delete cleanBatch.serialNumbers;
-            delete cleanBatch.serialNumber;
+            delete cleanBatch.defaultSerialNumber;
 
             dsuBuilder.addFileDataToDossier(transactionId, constants.BATCH_STORAGE_FILE, JSON.stringify(cleanBatch), (err) => {
                 if (err) {
@@ -166,7 +169,7 @@ export default class addBatchController extends ContainerController {
             }
 
             if(!batch.gtin || !batch.batchNumber || !batch.expiry){
-                alert("A mandatory field is missing");
+                return this.showError("GTIN, batchNumber and expiry date are mandatory");
                 return;
             }
             dsuBuilder.setGtinSSI(transactionId, dsuBuilder.holderInfo.domain, batch.gtin, batch.batchNumber, batch.expiry, (err) => {
@@ -189,9 +192,9 @@ export default class addBatchController extends ContainerController {
             if (err) {
                 // if no products file found an error will be captured here
                 //todo: improve error handling here
-                this.showError(err);
+                this.showError("Unknown error:" + err.message);
+                return callback(err);
             }
-
             if (typeof batches === "undefined" || batches === null) {
                 batches = [];
             }
