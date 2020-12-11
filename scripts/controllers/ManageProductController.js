@@ -371,7 +371,7 @@ export default class ManageProductController extends ContainerController {
             this.products.push(prodElement);
         }
 
-        product.creationTime = utils.convertDateToISO(Date.now());
+        product.creationTime = utils.convertDateTOGMTFormat(new Date());
 
         this.logService.log({
             logInfo: product,

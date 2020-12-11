@@ -13,7 +13,50 @@ function convertDateFromISOToGS1Format(isoDateString){
     return `${ye}${mo}${da}`;
 }
 
+
+function convertDateTOGMTFormat(date){
+    let formatter = new Intl.DateTimeFormat('en', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        hour12: false,
+        weekday: "short",
+        monthday: "short",
+        timeZone: 'GMT'
+    });
+
+    let arr = formatter.formatToParts(date);
+    let no = {};
+    arr.forEach( item =>{
+        no[item.type] = item.value;
+    })
+    let {year, month, day, hour, minute } = no;
+
+    let offset = -date.getTimezoneOffset();
+    let offset_min = offset % 60;
+    if(!offset_min){
+        offset_min = "00"
+    }
+    offset = offset / 60;
+    let offsetStr = "GMT ";
+    if(offset){
+        if(offset >0){
+            offsetStr+= "+";
+        }
+        offsetStr+=offset;
+        offsetStr+=":";
+        offsetStr+=offset_min;
+    }
+
+    return `${year} ${month} ${day} ${hour}:${minute} ${offsetStr}`;
+}
+
+
 export default {
     convertDateFromISOToGS1Format,
-    convertDateToISO
+    convertDateToISO,
+    convertDateTOGMTFormat
 }

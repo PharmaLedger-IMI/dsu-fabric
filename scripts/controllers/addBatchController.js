@@ -48,6 +48,9 @@ export default class addBatchController extends ContainerController {
 
         this.on("add-batch", () => {
             let batch = this.model.batch;
+            if(!batch.expiryForDisplay){
+                return this.showError("Invalid date");
+            }
             batch.expiry = utils.convertDateToISO(batch.expiryForDisplay);
             batch.expiry = utils.convertDateFromISOToGS1Format(batch.expiry);
             this.storageService.getItem(constants.BATCHES_STORAGE_PATH, "json", (err, batches) => {
@@ -82,7 +85,7 @@ export default class addBatchController extends ContainerController {
                         return this.showErrorModalAndRedirect("Batch DSU build failed.", "batches");
                     }
                     batch.keySSI = keySSI;
-                    batch.creationTime = utils.convertDateToISO(Date.now());
+                    batch.creationTime = utils.convertDateTOGMTFormat(new Date());
 
                     this.buildImmutableDSU(batch, (err, gtinSSI) => {
                         if (err) {
