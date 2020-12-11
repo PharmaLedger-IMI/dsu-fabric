@@ -44,6 +44,8 @@ export default class ManageProductController extends ContainerController {
             this.products = products;
             if (typeof this.productIndex !== "undefined") {
                 this.model.product = new Product(this.getLastVersionProduct());
+                let imagePath = `${constants.DATA_STORAGE_PATH}${this.model.product.gtin}${constants.PRODUCT_IMAGE_FILE}`;
+                this.model.product.photo = `/download${imagePath}`;
                 this.model.product.version++;
             } else {
                 this.model.product = new Product();
@@ -63,6 +65,8 @@ export default class ManageProductController extends ContainerController {
 
         this.on("product-photo-selected", (event) => {
             this.productPhoto = event.data;
+            let imagePath = `${constants.DATA_STORAGE_PATH}${this.model.product.gtin}${constants.PRODUCT_IMAGE_FILE}`;
+            this.storageService.setItem(imagePath, this.productPhoto, ()=>{})
         });
 
         this.on('openFeedback', (e) => {
