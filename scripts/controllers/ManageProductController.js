@@ -7,7 +7,7 @@ import DSU_Builder from '../services/DSU_Builder.js';
 import UploadTypes from "../models/UploadTypes.js";
 import utils from "../utils.js";
 import LogService from '../services/LogService.js';
-
+import Utils from "../models/Utils.js";
 
 const dsuBuilder = new DSU_Builder();
 const PRODUCT_STORAGE_FILE = constants.PRODUCT_STORAGE_FILE;
@@ -377,6 +377,7 @@ export default class ManageProductController extends ContainerController {
             this.products = [];
         }
 
+        product.gs1Data = `(01)${product.gtin}(21)WRONG(10)${Utils.generateID(6)}(17)111111`;
         if (typeof this.productIndex !== "undefined" && this.productIndex >= 0) {
             this.products[this.productIndex][product.gtin].push(product);
         } else {
@@ -386,13 +387,13 @@ export default class ManageProductController extends ContainerController {
         }
 
         product.creationTime = utils.convertDateTOGMTFormat(new Date());
-
         this.logService.log({
             logInfo: product,
             username: this.model.username,
             action: "Created product",
             logType: 'PRODUCT_LOG'
         });
+
         this.storageService.setItem(constants.PRODUCTS_STORAGE_PATH, JSON.stringify(this.products), callback);
     }
 
