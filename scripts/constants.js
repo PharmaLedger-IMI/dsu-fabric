@@ -7,7 +7,7 @@ export default {
     'BATCH_KEYSSI_STORAGE_PATH': "/app/data/batchKeySSIs.json",
     'BATCHES_STORAGE_PATH': "/app/data/batches.json",
     'HOLDER_FILE': "/app/data/batches.json",
-    'PRODUCT_DSU_MOUNT_POINT': "/product",
+    'PRODUCT_DSU_MOUNT_POINT': "/gtinDSU",
     'BATCH_STORAGE_FILE': "/batch.json",
     'PRODUCT_STORAGE_FILE': "/product.json",
     'PRODUCT_IMAGE_FILE': "/image.png",

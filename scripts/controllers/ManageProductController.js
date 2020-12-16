@@ -66,7 +66,8 @@ export default class ManageProductController extends ContainerController {
         this.on("product-photo-selected", (event) => {
             this.productPhoto = event.data;
             let imagePath = `${constants.DATA_STORAGE_PATH}${this.model.product.gtin}${constants.PRODUCT_IMAGE_FILE}`;
-            this.storageService.setItem(imagePath, this.productPhoto, ()=>{})
+            this.storageService.setItem(imagePath, this.productPhoto, () => {
+            })
         });
 
         this.on('openFeedback', (e) => {
@@ -84,7 +85,7 @@ export default class ManageProductController extends ContainerController {
                 return;
             }
 
-            if(this.sameProductVersionExists()){
+            if (this.sameProductVersionExists()) {
                 return this.showErrorModalAndRedirect("A product with the same GTIN already exists.", "products");
             }
 
@@ -94,22 +95,33 @@ export default class ManageProductController extends ContainerController {
                     this.closeModal();
                     return this.showErrorModalAndRedirect("Product DSU build failed.", "products");
                 }
-                product.keySSI = keySSI;
 
                 console.log("Product DSU KeySSI:", keySSI);
-                this.persistProduct(product, (err) => {
+                this.buildConstProductDSU(product.gtin, keySSI, (err, gtinSSI) => {
                     if (err) {
-                        this.closeModal();
-                        return this.showErrorModalAndRedirect("Product keySSI failed to be stored in your wallet.", "products");
+                        if (err) {
+                            this.closeModal();
+                            return this.showErrorModalAndRedirect("Const Product DSU build failed.", "products");
+                        }
                     }
-                    this.closeModal();
-                    this.History.navigateToPageByTag("products");
+                    product.keySSI = gtinSSI;
+
+                    console.log("ConstProductDSU GTIN_SSI:", gtinSSI);
+
+                    this.persistProduct(product, (err) => {
+                        if (err) {
+                            this.closeModal();
+                            return this.showErrorModalAndRedirect("Product keySSI failed to be stored in your wallet.", "products");
+                        }
+                        this.closeModal();
+                        this.History.navigateToPageByTag("products");
+                    })
                 });
             });
         });
     }
 
-    getLastVersionProduct(){
+    getLastVersionProduct() {
         const productVersions = Object.values(this.products[this.productIndex])[0];
         return productVersions[productVersions.length - 1];
     }
@@ -189,7 +201,7 @@ export default class ManageProductController extends ContainerController {
         if (typeof this.products === "undefined" || this.products === null || this.products.length === 0) {
             return false;
         }
-        if (typeof this.productIndex === "undefined" ) {
+        if (typeof this.productIndex === "undefined") {
             const products = this.products.map(product => {
                 return Object.keys(product)[0];
             });
@@ -203,7 +215,7 @@ export default class ManageProductController extends ContainerController {
         return false;
     }
 
-    buildConstProductDSU(gtin, callback) {
+    buildConstProductDSU(gtin, productDSUKeySSI, callback) {
         dsuBuilder.getTransactionId((err, transactionId) => {
             if (err) {
                 return callback(err);
@@ -213,29 +225,31 @@ export default class ManageProductController extends ContainerController {
                 if (err) {
                     return callback(err);
                 }
-                //TODO: derive a sReadSSI here...
-                dsuBuilder.buildDossier(transactionId, callback);
+                dsuBuilder.mount(transactionId, "/product", productDSUKeySSI, (err) => {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    //TODO: derive a sReadSSI here...
+                    dsuBuilder.buildDossier(transactionId, callback);
+                });
             });
         });
     }
 
     buildProductDSU(product, callback) {
-        this.buildConstProductDSU(product.gtin, (err, gtinSSI) => {
+        dsuBuilder.getTransactionId((err, transactionId) => {
             if (err) {
-                return this.showErrorModalAndRedirect("A product with the same GTIN was already created", "products", 3000);
+                return callback(err);
             }
-            dsuBuilder.getTransactionId((err, transactionId) => {
-                if (err) {
-                    return callback(err);
-                }
 
-                if (product.version > 1) {
-                    this.updateProductDSU(transactionId, product, callback);
-                } else {
-                    this.createProductDSU(transactionId, product, callback);
-                }
-            });
+            if (product.version > 1) {
+                this.updateProductDSU(transactionId, product, callback);
+            } else {
+                this.createProductDSU(transactionId, product, callback);
+            }
         });
+
     }
 
     createProductDSU(transactionId, product, callback) {
@@ -276,14 +290,14 @@ export default class ManageProductController extends ContainerController {
 
     addProductFilesToDSU(transactionId, product, callback) {
         const basePath = '/' + product.version;
-        product.photo = basePath + PRODUCT_IMAGE_FILE;
-        product.leaflet = basePath + LEAFLET_ATTACHMENT_FILE;
+        product.photo = PRODUCT_IMAGE_FILE;
+        product.leaflet = LEAFLET_ATTACHMENT_FILE;
         const productStorageFile = basePath + PRODUCT_STORAGE_FILE;
         dsuBuilder.addFileDataToDossier(transactionId, productStorageFile, JSON.stringify(product), (err) => {
             if (err) {
                 return callback(err);
             }
-            dsuBuilder.addFileDataToDossier(transactionId, product.photo, this.productPhoto, (err) => {
+            dsuBuilder.addFileDataToDossier(transactionId, basePath +  product.photo, this.productPhoto, (err) => {
                 if (err) {
                     return callback(err);
                 }
