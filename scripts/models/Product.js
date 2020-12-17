@@ -1,9 +1,9 @@
-import Utils from "./Utils.js";
+import utils from "../utils.js";
 
 export default class Product {
     name = "";
     gtin = "";
-    photo = "/download/code/assets/images/default.png";
+    photo = utils.getFetchUrl("/download/code/assets/images/default.png");
     description = "";
     leaflet = "";
     manufName = " ";
