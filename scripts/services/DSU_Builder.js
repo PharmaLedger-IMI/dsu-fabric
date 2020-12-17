@@ -1,4 +1,5 @@
 import utils from "./utils.js";
+import scriptUtils from "../utils.js";
 
 const doPost = utils.getPostHandlerFor("dsu-wizard");
 
@@ -27,7 +28,7 @@ export default class DSU_Builder {
 
     ensureHolderInfo(callback) {
         function getJSON(pth, callback){
-            fetch(pth).then((response) => {
+            scriptUtils.fetch(pth).then((response) => {
                 return response.json();
             }).then((json) => {
                 return callback(undefined, json)
